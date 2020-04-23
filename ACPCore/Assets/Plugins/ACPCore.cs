@@ -97,8 +97,8 @@ namespace com.adobe.marketing.mobile
 		}
 	}
 
-    public class ACPCore 
-    {
+	public class ACPCore 
+	{
 		#if UNITY_ANDROID && !UNITY_EDITOR
 		private static string CONST_JAVA_CLASS_UNITY_PLAYER = "com.unity3d.player.UnityPlayer";
 		#endif
@@ -117,23 +117,23 @@ namespace com.adobe.marketing.mobile
 			UNKOWN = -1
 		};
 
-        #if UNITY_IPHONE 
+		#if UNITY_IPHONE 
 		/* ===================================================================
 		 * extern declarations for iOS Methods
 		 * =================================================================== */
 		[DllImport ("__Internal")]
 		private static extern System.IntPtr acp_Core_ExtensionVersion();
 
-        #endif
-        
-        #if UNITY_ANDROID && !UNITY_EDITOR
+		#endif
+		
+		#if UNITY_ANDROID && !UNITY_EDITOR
 		/* ===================================================================
 		* Static Helper objects for our JNI access
 		* =================================================================== */
-        static AndroidJavaClass mobileCore = new AndroidJavaClass("com.adobe.marketing.mobile.MobileCore");
-        #endif
+		static AndroidJavaClass mobileCore = new AndroidJavaClass("com.adobe.marketing.mobile.MobileCore");
+		#endif
 
-        /*---------------------------------------------------------------------
+		/*---------------------------------------------------------------------
 		* Core Methods
 		*----------------------------------------------------------------------*/
 		public static string ExtensionVersion() 
@@ -424,6 +424,6 @@ namespace com.adobe.marketing.mobile
 			}
 		}
 		#endif
-    }
+	}
 }
 
