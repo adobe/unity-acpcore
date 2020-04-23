@@ -29,12 +29,45 @@ public class SceneScript : MonoBehaviour
     // Identity Buttons
     public Button btnIdentityExtensionVersion;
 
+    // Core callbacks
+	[MonoPInvokeCallback(typeof(AdobeExtensionErrorCallback))]
+	public static void HandleAdobeExtensionErrorCallback(ExtensionError error)
+	{
+		print("Error is : " + error.errorName);
+	}
+
+	[MonoPInvokeCallback(typeof(AdobeEventCallback))]
+	public static void HandleAdobeEventCallback(ACPExtensionEvent eventObj)
+	{
+		print("Event is : " + eventObj.eventName);
+	}
+
+    [MonoPInvokeCallback(typeof(AdobePrivacyStatusCallback))]
+	public static void HandleAdobePrivacyStatusCallback(ACPCore.ACPMobilePrivacyStatus status)
+	{
+		print("Privacy status is : " + status.ToString());
+	}
+
+    [MonoPInvokeCallback(typeof(AdobeCallback))]
+	public static void HandleGetIdentitiesAdobeCallback(object ids)
+	{
+        if (ids is string) {
+            print("Ids are : " + ids);
+        }
+	}
+
+    [MonoPInvokeCallback(typeof(AdobeCallback))]
+	public static void HandleStartAdobeCallback(object ids)
+	{
+        ACPCore.ConfigureWithAppID("launch-ENf8ed5382efc84d5b81a9be8dcc231be1-development");
+	}
+
     // Start is called before the first frame update
     void Start()
     {
         ACPCore.SetApplication();
         ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.VERBOSE);
-        ACPCore.start();
+        ACPCore.Start(HandleStartAdobeCallback);
 
         // Core
         btnCoreExtensionVersion.onClick.AddListener(coreExtensionVersion);
@@ -58,30 +91,15 @@ public class SceneScript : MonoBehaviour
         btnIdentityExtensionVersion.onClick.AddListener(identityExtensionVersion);
     }
 
-    // Core callbacks
-	[MonoPInvokeCallback(typeof(AdobeExtensionErrorCallback))]
-	public static void HandleAdobeExtensionErrorCallback(ExtensionError error)
-	{
-		print("Error is : " + error.errorName);
-	}
-
-	[MonoPInvokeCallback(typeof(AdobeEventCallback))]
-	public static void HandleAdobeCallback(ACPExtensionEvent eventObj)
-	{
-		print("Event is : " + eventObj.eventName);
-	}
-
-    [MonoPInvokeCallback(typeof(AdobePrivacyStatusCallback))]
-	public static void HandleAdobePrivacyStatusCallback(ACPCore.ACPMobilePrivacyStatus status)
-	{
-		print("Privacy status is : " + status.ToString());
-	}
-
-    [MonoPInvokeCallback(typeof(AdobeCallback))]
-	public static void HandleAdobeCallback(string ids)
-	{
-		print("Ids are : " + ids);
-	}
+    private void OnApplicationPause(bool pauseStatus) {
+        if (pauseStatus) {
+            ACPCore.LifecyclePause();
+        } else {
+            var cdata = new Dictionary<string, string> ();
+		    cdata.Add ("launch.data", "added");
+            ACPCore.LifecycleStart(cdata);
+        }
+    }
 
     // Core Methods
     void coreExtensionVersion()
@@ -127,7 +145,7 @@ public class SceneScript : MonoBehaviour
         print ("Calling dispatchEventWithResponseCallback");
         var dict = new Dictionary<string, object> ();
 		dict.Add ("eventDataKey", "eventDataValue");
-        ACPCore.DispatchEventWithResponseCallback(new ACPExtensionEvent("eventname", "eventType", "eventSource", dict), HandleAdobeCallback, HandleAdobeExtensionErrorCallback);
+        ACPCore.DispatchEventWithResponseCallback(new ACPExtensionEvent("eventname", "eventType", "eventSource", dict), HandleAdobeEventCallback, HandleAdobeExtensionErrorCallback);
     }
 
     void dispatchResponseEvent() {
@@ -151,7 +169,7 @@ public class SceneScript : MonoBehaviour
 
     void getSdkIdentities() {
         print ("Calling getSdkIdentities");
-        ACPCore.GetSdkIdentities(HandleAdobeCallback);
+        ACPCore.GetSdkIdentities(HandleGetIdentitiesAdobeCallback);
     }
 
     void getPrivacyStatus() {

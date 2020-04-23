@@ -8,7 +8,7 @@ namespace com.adobe.marketing.mobile
 	public delegate void AdobeExtensionErrorCallback(ExtensionError error);
 	public delegate void AdobeEventCallback(ACPExtensionEvent eventObj);
 	public delegate void AdobePrivacyStatusCallback(ACPCore.ACPMobilePrivacyStatus privacyStatus);
-	public delegate void AdobeCallback(string value);
+	public delegate void AdobeCallback(object value);
 
 	#if UNITY_ANDROID
 	class ExtensionErrorCallback: AndroidJavaProxy
@@ -66,7 +66,7 @@ namespace com.adobe.marketing.mobile
 			redirectedDelegate = callback;
 		}
 
-		void call(string value)
+		void call(object value)
 		{
 			redirectedDelegate (value);
 		}
@@ -192,9 +192,15 @@ namespace com.adobe.marketing.mobile
 			return ACPMobileLogLevel.UNKOWN;
 		}
 
-		public static void start() {
+		public static void Start(AdobeCallback callback) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			mobileCore.CallStatic("start", null);
+			mobileCore.CallStatic("start", new Callback(callback));
+			#endif
+		}
+
+		public static void ConfigureWithAppID(string appId) {
+			#if UNITY_ANDROID && !UNITY_EDITOR
+			mobileCore.CallStatic("configureWithAppID", appId);
 			#endif
 		}
 
@@ -276,6 +282,19 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject contextData = GetStringHashMapFromDictionary(contextDataDict);
 			mobileCore.CallStatic("trackAction", action, contextData);
+			#endif
+		}
+
+		public static void LifecycleStart(Dictionary<string, string> additionalContextData) {
+			#if UNITY_ANDROID && !UNITY_EDITOR
+			AndroidJavaObject contextData = GetStringHashMapFromDictionary(additionalContextData);
+			mobileCore.CallStatic("lifecycleStart", contextData);
+			#endif
+		}
+
+		public static void LifecyclePause() {
+			#if UNITY_ANDROID && !UNITY_EDITOR
+			mobileCore.CallStatic("lifecyclePause");
 			#endif
 		}
 
