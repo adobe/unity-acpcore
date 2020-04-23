@@ -1,6 +1,11 @@
-# unity-acpcore
+# Adobe Experience Platform - Core package for Unity apps
 
-# Unity Plugin for V5 ACP Core sdk
+[![CI](https://github.com/adobe/unity-acpcore/workflows/CI/badge.svg)](https://github.com/adobe/unity-acpcore/actions)
+[![npm](https://img.shields.io/npm/v/@adobe/unity-acpcore)](https://www.npmjs.com/package/@adobe/unity-acpcore)
+[![GitHub](https://img.shields.io/github/license/adobe/unity-acpcore)](https://github.com/adobe/unity-acpcore/blob/master/LICENSE)
+
+# TODO
+update me
 
 This repository holds files necessary to create and distribute the Unity plugin for Adobe's V5 ACP Core SDK.
 
@@ -47,8 +52,10 @@ To build and deploy changes:
 1. Name build whatever you want and press __Save__
 1. `Unity` will create and open an `Xcode` project
 
-## Distribution
+## Contributing
+Looking to contribute to this project? Please review our [Contributing guidelines](.github/CONTRIBUTING.md) prior to opening a pull request.
 
-#### Licensing
+We look forward to working with you!
 
-## Resources
+## Licensing
+This project is licensed under the Apache V2 License. See [LICENSE](LICENSE) for more information.
