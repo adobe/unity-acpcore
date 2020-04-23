@@ -136,7 +136,7 @@ namespace com.adobe.marketing.mobile
         /*---------------------------------------------------------------------
 		* Core Methods
 		*----------------------------------------------------------------------*/
-		public static string CoreExtensionVersion() 
+		public static string ExtensionVersion() 
 		{
 			#if UNITY_IPHONE && !UNITY_EDITOR		
 			return Marshal.PtrToStringAnsi(acp_Core_ExtensionVersion());		

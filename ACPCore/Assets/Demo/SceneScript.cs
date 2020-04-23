@@ -86,7 +86,7 @@ public class SceneScript : MonoBehaviour
     // Core Methods
     void coreExtensionVersion()
 	{
-		string version = ACPCore.CoreExtensionVersion();
+		string version = ACPCore.ExtensionVersion();
         print (version);
 	}
 
