@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
+using System.Runtime.InteropServices;
+using AOT;
 
 namespace com.adobe.marketing.mobile
 {
-	public delegate void AdobeExtensionErrorCallback(ExtensionError error);
-	public delegate void AdobeEventCallback(ACPExtensionEvent eventObj);
-	public delegate void AdobePrivacyStatusCallback(ACPCore.ACPMobilePrivacyStatus privacyStatus);
-	public delegate void AdobeCallback(object value);
+	public delegate void AdobeExtensionErrorCallback(string errorName, string errorCode);
+	public delegate void AdobeEventCallback(string eventName, string eventType, string eventSource, string jsonEventData);
+	public delegate void AdobePrivacyStatusCallback(int privacyStatus);
+	public delegate void AdobeStartCallback();
+	public delegate void AdobeIdentitiesCallback(string value);
 
 	#if UNITY_ANDROID
 	class ExtensionErrorCallback: AndroidJavaProxy
@@ -23,7 +27,7 @@ namespace com.adobe.marketing.mobile
 			string errorName = error.Call<string>("getErrorName");
 			int errorCode = error.Call<int>("getErrorCode");
 
-			redirectedDelegate (new ExtensionError(errorName, errorCode));
+			redirectedDelegate (errorName, errorCode);
 		}
 	}
 
@@ -59,14 +63,27 @@ namespace com.adobe.marketing.mobile
 		}
 	}
 
-	class Callback: AndroidJavaProxy
+	class StartCallback: AndroidJavaProxy
 	{
-		AdobeCallback redirectedDelegate;
-		public Callback (AdobeCallback callback): base("com.adobe.marketing.mobile.AdobeCallback") {
+		AdobeStartCallback redirectedDelegate;
+		public StartCallback (AdobeStartCallback callback): base("com.adobe.marketing.mobile.AdobeCallback") {
 			redirectedDelegate = callback;
 		}
 
 		void call(object value)
+		{
+			redirectedDelegate ();
+		}
+	}
+
+	class IdentitiesCallback: AndroidJavaProxy
+	{
+		AdobeIdentitiesCallback redirectedDelegate;
+		public IdentitiesCallback (AdobeIdentitiesCallback callback): base("com.adobe.marketing.mobile.AdobeCallback") {
+			redirectedDelegate = callback;
+		}
+
+		void call(string value)
 		{
 			redirectedDelegate (value);
 		}
@@ -122,7 +139,75 @@ namespace com.adobe.marketing.mobile
 		 * extern declarations for iOS Methods
 		 * =================================================================== */
 		[DllImport ("__Internal")]
-		private static extern System.IntPtr acp_Core_ExtensionVersion();
+		private static extern System.IntPtr acp_ExtensionVersion();
+		
+		[DllImport ("__Internal")]
+		private static extern void acp_SetLogLevel(int logLevel);
+
+		[DllImport ("__Internal")]
+		private static extern int acp_GetLogLevel();
+		
+		[DllImport ("__Internal")]
+		private static extern void acp_Start(AdobeStartCallback callback);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_ConfigureWithAppID(string appId);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_DispatchEvent(string eventName, 
+		string eventType, 
+		string eventSource, 
+		string cData,
+		AdobeExtensionErrorCallback errorCallback);
+		
+		[DllImport ("__Internal")]
+		private static extern void acp_DispatchEventWithResponseCallback(string eventName, 
+		string eventType, 
+		string eventSource, 
+		string cData,
+		AdobeEventCallback responseCallback,
+		AdobeExtensionErrorCallback errorCallback);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_DispatchResponseEvent(string responseEventName, 
+		string responseEventType, 
+		string responseEventSource, 
+		string responseCData,
+		string requestEventName,
+		string requestEventType,
+		string requestEventSource,
+		string requestCData,
+		AdobeExtensionErrorCallback errorCallback);
+		
+		[DllImport ("__Internal")]
+		private static extern void acp_SetPrivacyStatus(int privacyStatus);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_SetAdvertisingIdentifier(string adId);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_GetSdkIdentities(AdobeIdentitiesCallback callback);
+		
+		[DllImport ("__Internal")]
+		private static extern void acp_GetPrivacyStatus(AdobePrivacyStatusCallback callback);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_DownloadRules();
+		
+		[DllImport ("__Internal")]
+		private static extern void acp_UpdateConfiguration(string cdataString);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_TrackState(string name, string cdataString);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_TrackAction(string name, string cdataString);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_LifecycleStart(string cdataString);
+
+		[DllImport ("__Internal")]
+		private static extern void acp_LifecyclePause();
 
 		#endif
 		
@@ -139,7 +224,7 @@ namespace com.adobe.marketing.mobile
 		public static string ExtensionVersion() 
 		{
 			#if UNITY_IPHONE && !UNITY_EDITOR		
-			return Marshal.PtrToStringAnsi(acp_Core_ExtensionVersion());		
+			return Marshal.PtrToStringAnsi(acp_ExtensionVersion());		
 			#elif UNITY_ANDROID && !UNITY_EDITOR 
 			return mobileCore.CallStatic<string> ("extensionVersion");
 			#else
@@ -177,6 +262,8 @@ namespace com.adobe.marketing.mobile
 				var logModelObject = logLevelVar.GetStatic<AndroidJavaObject>(logLevel.ToString());
 				mobileCore.CallStatic("setLogLevel", logModelObject);
 			}
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_SetLogLevel((int)logLevel);
 			#endif
 		}
 
@@ -187,20 +274,26 @@ namespace com.adobe.marketing.mobile
 				int level = logLevel.Call<int>("ordinal");
 				return ACPMobileLogLevelFromInt(level);
 			}
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			return ACPMobileLogLevelFromInt(acp_GetLogLevel());
 			#endif
 
 			return ACPMobileLogLevel.UNKOWN;
 		}
 
-		public static void Start(AdobeCallback callback) {
+		public static void Start(AdobeStartCallback callback) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("start", new Callback(callback));
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_Start(callback);
 			#endif
 		}
 
 		public static void ConfigureWithAppID(string appId) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("configureWithAppID", appId);
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_ConfigureWithAppID(appId);
 			#endif
 		}
 
@@ -208,6 +301,9 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject eventObj = GetAdobeEventFromACPExtensionEvent(acpExtensionEvent);
 			mobileCore.CallStatic<Boolean>("dispatchEvent", eventObj, new ExtensionErrorCallback(errorCallback));
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			string jsonDataEvent = JsonStringFromDictionary(acpExtensionEvent.eventData);
+			acp_DispatchEvent(acpExtensionEvent.eventName, acpExtensionEvent.eventType, acpExtensionEvent.eventSource, jsonDataEvent, errorCallback);
 			#endif
 		}
 
@@ -215,6 +311,9 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject eventObj = GetAdobeEventFromACPExtensionEvent(acpExtensionEvent);
 			mobileCore.CallStatic<Boolean>("dispatchEventWithResponseCallback", eventObj, new EventCallback(responseCallback), new ExtensionErrorCallback(errorCallback));
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			string jsonDataEvent = JsonStringFromDictionary(acpExtensionEvent.eventData);
+			acp_DispatchEventWithResponseCallback(acpExtensionEvent.eventName, acpExtensionEvent.eventType, acpExtensionEvent.eventSource, jsonDataEvent, responseCallback, errorCallback);
 			#endif
 		}
 
@@ -223,6 +322,11 @@ namespace com.adobe.marketing.mobile
 			AndroidJavaObject responseEventObject = GetAdobeEventFromACPExtensionEvent(responseEvent);
 			AndroidJavaObject requestEventObject = GetAdobeEventFromACPExtensionEvent(requestEvent);
 			mobileCore.CallStatic<Boolean>("dispatchResponseEvent", responseEventObject, requestEventObject, new ExtensionErrorCallback(errorCallback));
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			string responseJsonDataEvent = JsonStringFromDictionary(responseEvent.eventData);
+			string requestJsonDataEvent = JsonStringFromDictionary(requestEvent.eventData);
+			acp_DispatchResponseEvent(responseEvent.eventName, responseEvent.eventType, responseEvent.eventSource, responseJsonDataEvent,
+			requestEvent.eventName, requestEvent.eventType, requestEvent.eventSource, requestJsonDataEvent, errorCallback);
 			#endif
 		}
 
@@ -233,24 +337,32 @@ namespace com.adobe.marketing.mobile
 				var privacyStatusObject = privacyClass.GetStatic<AndroidJavaObject>(privacyStatus.ToString());
 				mobileCore.CallStatic("setPrivacyStatus", privacyStatusObject);
 			}
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_SetPrivacyStatus((int)privacyStatus);
 			#endif
 		}
 
 		public static void SetAdvertisingIdentifier(string adId) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("setAdvertisingIdentifier", adId);
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_SetAdvertisingIdentifier(adId);
 			#endif
 		}
 
-		public static void GetSdkIdentities(AdobeCallback callback) {
+		public static void GetSdkIdentities(AdobeIdentitiesCallback callback) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("getSdkIdentities", new Callback(callback));
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_GetSdkIdentities(callback);
 			#endif
 		}
 
 		public static void GetPrivacyStatus(AdobePrivacyStatusCallback callback) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("getPrivacyStatus", new PrivacyStatusCallback(callback));
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_GetPrivacyStatus(callback);
 			#endif
 		}
 
@@ -261,6 +373,8 @@ namespace com.adobe.marketing.mobile
 				AndroidJavaObject logDebug = logLevelVar.GetStatic<AndroidJavaObject>("DEBUG");
 				mobileCore.CallStatic("log", logDebug, "ACPCore", "DownloadRules() cannot be invoked on Android");
 			}
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_DownloadRules();
 			#endif
 		}
 
@@ -268,20 +382,26 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			var map = GetHashMapFromDictionary(config);
 			mobileCore.CallStatic("updateConfiguration", map);
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_UpdateConfiguration(JsonStringFromDictionary(config));
 			#endif
 		}
 
-		public static void TrackState(string state, Dictionary<string, string> contextDataDict) {
+		public static void TrackState(string name, Dictionary<string, string> contextDataDict) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject contextData = GetStringHashMapFromDictionary(contextDataDict);
-			mobileCore.CallStatic("trackState", state, contextData);
+			mobileCore.CallStatic("trackState", name, contextData);
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_TrackState(name, JsonStringFromStringDictionary(contextDataDict));
 			#endif
 		}
 
-		public static void TrackAction(string action, Dictionary<string, string> contextDataDict) {
+		public static void TrackAction(string name, Dictionary<string, string> contextDataDict) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject contextData = GetStringHashMapFromDictionary(contextDataDict);
-			mobileCore.CallStatic("trackAction", action, contextData);
+			mobileCore.CallStatic("trackAction", name, contextData);
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_TrackAction(name, JsonStringFromStringDictionary(contextDataDict));
 			#endif
 		}
 
@@ -289,12 +409,16 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject contextData = GetStringHashMapFromDictionary(additionalContextData);
 			mobileCore.CallStatic("lifecycleStart", contextData);
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_LifecycleStart(JsonStringFromStringDictionary(additionalContextData));
 			#endif
 		}
 
 		public static void LifecyclePause() {
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("lifecyclePause");
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_LifecyclePause();
 			#endif
 		}
 
@@ -330,6 +454,34 @@ namespace com.adobe.marketing.mobile
 				return ACPMobilePrivacyStatus.UNKNOWN;			
 			}
 		}
+
+		#if UNITY_IPHONE
+		private static string JsonStringFromDictionary(Dictionary<string, object> dict) 
+		{
+			if (dict == null || dict.Count <= 0) 
+			{
+				return null;
+			}
+			
+			var entries = dict.Select(d => string.Format("\"{0}\": \"{1}\"", d.Key, d.Value));
+			string jsonString = "{" + string.Join (",", entries.ToArray()) + "}";
+			
+			return jsonString;
+		}
+
+		private static string JsonStringFromStringDictionary(Dictionary<string, string> dict) 
+		{
+			if (dict == null || dict.Count <= 0) 
+			{
+				return null;
+			}
+			
+			var entries = dict.Select(d => string.Format("\"{0}\": \"{1}\"", d.Key, d.Value));
+			string jsonString = "{" + string.Join (",", entries.ToArray()) + "}";
+			
+			return jsonString;
+		}
+		#endif
 
 		#if UNITY_ANDROID
 		private static AndroidJavaObject GetHashMapFromDictionary(Dictionary<string, object> dict)
