@@ -31,25 +31,25 @@ public class SceneScript : MonoBehaviour
 
     // Core callbacks
     [MonoPInvokeCallback(typeof(AdobeExtensionErrorCallback))]
-    public static void HandleAdobeExtensionErrorCallback(ExtensionError error)
+    public static void HandleAdobeExtensionErrorCallback(string errorName, string errorCode)
     {
-        print("Error is : " + error.errorName);
+        print("Error is : " + errorName);
     }
 
     [MonoPInvokeCallback(typeof(AdobeEventCallback))]
-    public static void HandleAdobeEventCallback(ACPExtensionEvent eventObj)
+    public static void HandleAdobeEventCallback(string eventName, string eventType, string eventSource, string jsonEventData)
     {
-        print("Event is : " + eventObj.eventName);
+        print("Event is : " + eventName);
     }
 
     [MonoPInvokeCallback(typeof(AdobePrivacyStatusCallback))]
-    public static void HandleAdobePrivacyStatusCallback(ACPCore.ACPMobilePrivacyStatus status)
+    public static void HandleAdobePrivacyStatusCallback(int status)
     {
-        print("Privacy status is : " + status.ToString());
+        print("Privacy status is : " + ((ACPCore.ACPMobilePrivacyStatus)status).ToString());
     }
 
-    [MonoPInvokeCallback(typeof(AdobeCallback))]
-    public static void HandleGetIdentitiesAdobeCallback(object ids)
+    [MonoPInvokeCallback(typeof(AdobeIdentitiesCallback))]
+    public static void HandleGetIdentitiesAdobeCallback(string ids)
     {
         if (ids is string)
         {
@@ -57,10 +57,14 @@ public class SceneScript : MonoBehaviour
         }
     }
 
-    [MonoPInvokeCallback(typeof(AdobeCallback))]
-    public static void HandleStartAdobeCallback(object ids)
-    {
-        ACPCore.ConfigureWithAppID("launch-ENf8ed5382efc84d5b81a9be8dcc231be1-development");
+    [MonoPInvokeCallback(typeof(AdobeStartCallback))]
+    public static void HandleStartAdobeCallback()
+    {   
+        if (Application.platform == RuntimePlatform.Android) {
+            ACPCore.ConfigureWithAppID("launch-ENf8ed5382efc84d5b81a9be8dcc231be1-development");    
+        } else if (Application.platform == RuntimePlatform.IPhonePlayer) {
+            print("HandleStartAdobeCallback iphone");
+        }
     }
 
     // Start is called before the first frame update
@@ -129,7 +133,7 @@ public class SceneScript : MonoBehaviour
     void setLogLevel()
     {
         print("Setting Log Level");
-        ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.VERBOSE);
+        ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.ERROR);
     }
 
     void getLogLevel()
