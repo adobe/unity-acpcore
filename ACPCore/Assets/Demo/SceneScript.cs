@@ -25,13 +25,19 @@ public class SceneScript : MonoBehaviour
     public Button btnTrackState;
     public Button btnTrackAction;
 
-
     // Identity Buttons
     public Button btnIdentityExtensionVersion;
+    public Button btnAppendToUrl;
+    public Button btnGetIdentifiers;
+    public Button btnGetExperienceCloudId;
+    public Button btnSyncIdentifier;
+    public Button btnSyncIdentifiers;
+    public Button btnSyncIdentifiersWithAuthState;
+    public Button btnUrlVariables;
 
     // Core callbacks
     [MonoPInvokeCallback(typeof(AdobeExtensionErrorCallback))]
-    public static void HandleAdobeExtensionErrorCallback(string errorName, string errorCode)
+    public static void HandleAdobeExtensionErrorCallback(string errorName, int errorCode)
     {
         print("Error is : " + errorName);
     }
@@ -61,10 +67,35 @@ public class SceneScript : MonoBehaviour
     public static void HandleStartAdobeCallback()
     {   
         if (Application.platform == RuntimePlatform.Android) {
-            ACPCore.ConfigureWithAppID("launch-ENf8ed5382efc84d5b81a9be8dcc231be1-development");    
+            ACPCore.ConfigureWithAppID("launch-ENc28aaf2fb6934cff830c8d3ddc5465b1-development");    
         } else if (Application.platform == RuntimePlatform.IPhonePlayer) {
             print("HandleStartAdobeCallback iphone");
         }
+    }
+
+    // Identity Callbacks
+    [MonoPInvokeCallback(typeof(AdobeIdentityAppendToUrlCallback))]
+    public static void HandleAdobeIdentityAppendToUrlCallback(string url)
+    {
+        print("Url is : " + url);
+    }
+
+    [MonoPInvokeCallback(typeof(AdobeGetIdentifiersCallback))]
+    public static void HandleAdobeGetIdentifiersCallback(string visitorIds)
+    {
+        print("Ids is : " + visitorIds);
+    }
+
+    [MonoPInvokeCallback(typeof(AdobeGetExperienceCloudIdCallback))]
+    public static void HandleAdobeGetExperienceCloudIdCallback(string cloudId)
+    {
+        print("Url is : " + cloudId);
+    }
+
+    [MonoPInvokeCallback(typeof(AdobeGetUrlVariables))]
+    public static void HandleAdobeGetUrlVariables(string urlVariables)
+    {
+        print("Url variables are : " + urlVariables);
     }
 
     // Start is called before the first frame update
@@ -72,6 +103,7 @@ public class SceneScript : MonoBehaviour
     {
         ACPCore.SetApplication();
         ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.VERBOSE);
+        ACPIdentity.registerExtension();
         ACPCore.Start(HandleStartAdobeCallback);
 
         // Core
@@ -94,6 +126,13 @@ public class SceneScript : MonoBehaviour
 
         // Identity
         btnIdentityExtensionVersion.onClick.AddListener(identityExtensionVersion);
+        btnAppendToUrl.onClick.AddListener(appendToUrl);
+        btnGetIdentifiers.onClick.AddListener(getIdentifiers);
+        btnGetExperienceCloudId.onClick.AddListener(getExperienceCloudId);
+        btnSyncIdentifier.onClick.AddListener(syncIdentifier);
+        btnSyncIdentifiers.onClick.AddListener(syncIdentifiers);
+        btnSyncIdentifiersWithAuthState.onClick.AddListener(syncIdentifiersWithAuthState);
+        btnUrlVariables.onClick.AddListener(urlVariables);
     }
 
     private void OnApplicationPause(bool pauseStatus)
@@ -226,7 +265,43 @@ public class SceneScript : MonoBehaviour
     // Identity Methods
     void identityExtensionVersion()
     {
-        string version = ACPIdentity.IdentityExtensionVersion();
+        string version = ACPIdentity.ExtensionVersion();
         print(version);
+    }
+
+    void appendToUrl() {
+        ACPIdentity.AppendToUrl("visitorId", HandleAdobeIdentityAppendToUrlCallback);
+    }
+
+    void getIdentifiers() {
+        ACPIdentity.GetIdentifiers(HandleAdobeIdentityAppendToUrlCallback);
+    }
+
+    void getExperienceCloudId() {
+        ACPIdentity.GetExperienceCloudIdCallback(HandleAdobeGetExperienceCloudIdCallback);
+    }
+
+    void syncIdentifier() {
+        ACPIdentity.SyncIdentifier("idType1", "idValue1", ACPIdentity.ACPAuthenticationState.AUTHENTICATED);
+    }
+
+    void syncIdentifiers() {
+        Dictionary<string, string> ids = new Dictionary<string, string>();
+        ids.Add("idsType1", "idValue1");
+        ids.Add("idsType2", "idValue2");
+        ids.Add("idsType3", "idValue3");
+        ACPIdentity.SyncIdentifiers(ids);
+    }
+
+    void syncIdentifiersWithAuthState() {
+        Dictionary<string, string> ids = new Dictionary<string, string>();
+        ids.Add("idsType1", "idValue1");
+        ids.Add("idsType2", "idValue2");
+        ids.Add("idsType3", "idValue3");
+        ACPIdentity.SyncIdentifiers(ids, ACPIdentity.ACPAuthenticationState.AUTHENTICATED);
+    }
+
+    void urlVariables() {
+        ACPIdentity.GetUrlVariables(HandleAdobeGetUrlVariables);
     }
 }

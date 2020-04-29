@@ -8,7 +8,7 @@ using AOT;
 
 namespace com.adobe.marketing.mobile
 {
-	public delegate void AdobeExtensionErrorCallback(string errorName, string errorCode);
+	public delegate void AdobeExtensionErrorCallback(string errorName, int errorCode);
 	public delegate void AdobeEventCallback(string eventName, string eventType, string eventSource, string jsonEventData);
 	public delegate void AdobePrivacyStatusCallback(int privacyStatus);
 	public delegate void AdobeStartCallback();
@@ -44,8 +44,8 @@ namespace com.adobe.marketing.mobile
 			string eventType = eventObj.Call<string>("getType");
 			string eventSource = eventObj.Call<string>("getSource");
 			AndroidJavaObject eventDataHashmap = eventObj.Call<AndroidJavaObject>("getEventData");
-			Dictionary<string, object> eventData = ACPCore.GetDictionaryFromHashMap(eventDataHashmap);
-			redirectedDelegate (new ACPExtensionEvent(eventName, eventType, eventSource, eventData));
+			Dictionary<string, object> eventData = ACPHelpers.GetDictionaryFromHashMap(eventDataHashmap);
+			redirectedDelegate (eventName, eventType, eventSource, ACPHelpers.JsonStringFromDictionary(eventData));
 		}
 	}
 
@@ -58,8 +58,7 @@ namespace com.adobe.marketing.mobile
 
 		void call(AndroidJavaObject status)
 		{
-			ACPCore.ACPMobilePrivacyStatus privacyStatusObject = ACPCore.ACPMobilePrivacyStatusFromInt(status.Call<int>("ordinal"));
-			redirectedDelegate (privacyStatusObject);
+			redirectedDelegate (status.Call<int>("ordinal"));
 		}
 	}
 
@@ -283,7 +282,7 @@ namespace com.adobe.marketing.mobile
 
 		public static void Start(AdobeStartCallback callback) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			mobileCore.CallStatic("start", new Callback(callback));
+			mobileCore.CallStatic("start", new StartCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
 			acp_Start(callback);
 			#endif
@@ -299,32 +298,32 @@ namespace com.adobe.marketing.mobile
 
 		public static void DispatchEvent(ACPExtensionEvent acpExtensionEvent, AdobeExtensionErrorCallback errorCallback) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			AndroidJavaObject eventObj = GetAdobeEventFromACPExtensionEvent(acpExtensionEvent);
+			AndroidJavaObject eventObj = ACPHelpers.GetAdobeEventFromACPExtensionEvent(acpExtensionEvent);
 			mobileCore.CallStatic<Boolean>("dispatchEvent", eventObj, new ExtensionErrorCallback(errorCallback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			string jsonDataEvent = JsonStringFromDictionary(acpExtensionEvent.eventData);
+			string jsonDataEvent = ACPHelpers.JsonStringFromDictionary(acpExtensionEvent.eventData);
 			acp_DispatchEvent(acpExtensionEvent.eventName, acpExtensionEvent.eventType, acpExtensionEvent.eventSource, jsonDataEvent, errorCallback);
 			#endif
 		}
 
 		public static void DispatchEventWithResponseCallback(ACPExtensionEvent acpExtensionEvent, AdobeEventCallback responseCallback, AdobeExtensionErrorCallback errorCallback) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			AndroidJavaObject eventObj = GetAdobeEventFromACPExtensionEvent(acpExtensionEvent);
+			AndroidJavaObject eventObj = ACPHelpers.GetAdobeEventFromACPExtensionEvent(acpExtensionEvent);
 			mobileCore.CallStatic<Boolean>("dispatchEventWithResponseCallback", eventObj, new EventCallback(responseCallback), new ExtensionErrorCallback(errorCallback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			string jsonDataEvent = JsonStringFromDictionary(acpExtensionEvent.eventData);
+			string jsonDataEvent = ACPHelpers.JsonStringFromDictionary(acpExtensionEvent.eventData);
 			acp_DispatchEventWithResponseCallback(acpExtensionEvent.eventName, acpExtensionEvent.eventType, acpExtensionEvent.eventSource, jsonDataEvent, responseCallback, errorCallback);
 			#endif
 		}
 
 		public static void DispatchResponseEvent(ACPExtensionEvent responseEvent, ACPExtensionEvent requestEvent, AdobeExtensionErrorCallback errorCallback) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			AndroidJavaObject responseEventObject = GetAdobeEventFromACPExtensionEvent(responseEvent);
-			AndroidJavaObject requestEventObject = GetAdobeEventFromACPExtensionEvent(requestEvent);
+			AndroidJavaObject responseEventObject = ACPHelpers.GetAdobeEventFromACPExtensionEvent(responseEvent);
+			AndroidJavaObject requestEventObject = ACPHelpers.GetAdobeEventFromACPExtensionEvent(requestEvent);
 			mobileCore.CallStatic<Boolean>("dispatchResponseEvent", responseEventObject, requestEventObject, new ExtensionErrorCallback(errorCallback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			string responseJsonDataEvent = JsonStringFromDictionary(responseEvent.eventData);
-			string requestJsonDataEvent = JsonStringFromDictionary(requestEvent.eventData);
+			string responseJsonDataEvent = ACPHelpers.JsonStringFromDictionary(responseEvent.eventData);
+			string requestJsonDataEvent = ACPHelpers.JsonStringFromDictionary(requestEvent.eventData);
 			acp_DispatchResponseEvent(responseEvent.eventName, responseEvent.eventType, responseEvent.eventSource, responseJsonDataEvent,
 			requestEvent.eventName, requestEvent.eventType, requestEvent.eventSource, requestJsonDataEvent, errorCallback);
 			#endif
@@ -352,7 +351,7 @@ namespace com.adobe.marketing.mobile
 
 		public static void GetSdkIdentities(AdobeIdentitiesCallback callback) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			mobileCore.CallStatic("getSdkIdentities", new Callback(callback));
+			mobileCore.CallStatic("getSdkIdentities", new IdentitiesCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
 			acp_GetSdkIdentities(callback);
 			#endif
@@ -380,37 +379,37 @@ namespace com.adobe.marketing.mobile
 
 		public static void UpdateConfiguration(Dictionary<string, object> config) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			var map = GetHashMapFromDictionary(config);
+			var map = ACPHelpers.GetHashMapFromDictionary(config);
 			mobileCore.CallStatic("updateConfiguration", map);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			acp_UpdateConfiguration(JsonStringFromDictionary(config));
+			acp_UpdateConfiguration(ACPHelpers.JsonStringFromDictionary(config));
 			#endif
 		}
 
 		public static void TrackState(string name, Dictionary<string, string> contextDataDict) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			AndroidJavaObject contextData = GetStringHashMapFromDictionary(contextDataDict);
+			AndroidJavaObject contextData = ACPHelpers.GetStringHashMapFromDictionary(contextDataDict);
 			mobileCore.CallStatic("trackState", name, contextData);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			acp_TrackState(name, JsonStringFromStringDictionary(contextDataDict));
+			acp_TrackState(name, ACPHelpers.JsonStringFromStringDictionary(contextDataDict));
 			#endif
 		}
 
 		public static void TrackAction(string name, Dictionary<string, string> contextDataDict) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			AndroidJavaObject contextData = GetStringHashMapFromDictionary(contextDataDict);
+			AndroidJavaObject contextData = ACPHelpers.GetStringHashMapFromDictionary(contextDataDict);
 			mobileCore.CallStatic("trackAction", name, contextData);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			acp_TrackAction(name, JsonStringFromStringDictionary(contextDataDict));
+			acp_TrackAction(name, ACPHelpers.JsonStringFromStringDictionary(contextDataDict));
 			#endif
 		}
 
 		public static void LifecycleStart(Dictionary<string, string> additionalContextData) {
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			AndroidJavaObject contextData = GetStringHashMapFromDictionary(additionalContextData);
+			AndroidJavaObject contextData = ACPHelpers.GetStringHashMapFromDictionary(additionalContextData);
 			mobileCore.CallStatic("lifecycleStart", contextData);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			acp_LifecycleStart(JsonStringFromStringDictionary(additionalContextData));
+			acp_LifecycleStart(ACPHelpers.JsonStringFromStringDictionary(additionalContextData));
 			#endif
 		}
 
@@ -454,128 +453,6 @@ namespace com.adobe.marketing.mobile
 				return ACPMobilePrivacyStatus.UNKNOWN;			
 			}
 		}
-
-		#if UNITY_IPHONE
-		private static string JsonStringFromDictionary(Dictionary<string, object> dict) 
-		{
-			if (dict == null || dict.Count <= 0) 
-			{
-				return null;
-			}
-			
-			var entries = dict.Select(d => string.Format("\"{0}\": \"{1}\"", d.Key, d.Value));
-			string jsonString = "{" + string.Join (",", entries.ToArray()) + "}";
-			
-			return jsonString;
-		}
-
-		private static string JsonStringFromStringDictionary(Dictionary<string, string> dict) 
-		{
-			if (dict == null || dict.Count <= 0) 
-			{
-				return null;
-			}
-			
-			var entries = dict.Select(d => string.Format("\"{0}\": \"{1}\"", d.Key, d.Value));
-			string jsonString = "{" + string.Join (",", entries.ToArray()) + "}";
-			
-			return jsonString;
-		}
-		#endif
-
-		#if UNITY_ANDROID
-		private static AndroidJavaObject GetHashMapFromDictionary(Dictionary<string, object> dict)
-		{
-			// quick out if nothing in the dict param
-			if (dict == null || dict.Count <= 0) 
-			{
-				return null;
-			}
-			
-			AndroidJavaObject hashMap = new AndroidJavaObject ("java.util.HashMap");
-			IntPtr putMethod = AndroidJNIHelper.GetMethodID(hashMap.GetRawClass(), "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-			object[] args = new object[2];
-			foreach (KeyValuePair<string, object> kvp in dict)
-			{
-				using (var key = new AndroidJavaObject("java.lang.String", kvp.Key))
-				{
-					using (var value = new AndroidJavaObject("java.lang.String", kvp.Value))
-					{
-						args[0] = key;
-						args[1] = value;
-						AndroidJNI.CallObjectMethod(hashMap.GetRawObject(), putMethod, AndroidJNIHelper.CreateJNIArgArray(args));
-					}
-				}
-			}
-			
-			return hashMap;
-		}
-
-		private static AndroidJavaObject GetStringHashMapFromDictionary(Dictionary<string, string> dict)
-		{
-			// quick out if nothing in the dict param
-			if (dict == null || dict.Count <= 0) 
-			{
-				return null;
-			}
-			
-			AndroidJavaObject hashMap = new AndroidJavaObject ("java.util.HashMap");
-			IntPtr putMethod = AndroidJNIHelper.GetMethodID(hashMap.GetRawClass(), "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-			object[] args = new object[2];
-			foreach (KeyValuePair<string, string> kvp in dict)
-			{
-				using (var key = new AndroidJavaObject("java.lang.String", kvp.Key))
-				{
-					using (var value = new AndroidJavaObject("java.lang.String", kvp.Value))
-					{
-						args[0] = key;
-						args[1] = value;
-						AndroidJNI.CallObjectMethod(hashMap.GetRawObject(), putMethod, AndroidJNIHelper.CreateJNIArgArray(args));
-					}
-				}
-			}
-			
-			return hashMap;
-		}
-
-		internal static Dictionary<string, object> GetDictionaryFromHashMap(AndroidJavaObject hashmap)
-		{
-			Dictionary<string, object> dict = new Dictionary<string,object> ();
-			AndroidJavaObject entrySet = hashmap.Call<AndroidJavaObject>("entrySet");
-			AndroidJavaObject[] array = entrySet.Call<AndroidJavaObject[]> ("toArray");
-			foreach (AndroidJavaObject keyValuepair in array) 
-			{
-				string key = keyValuepair.Call<string> ("getKey");
-				string value = keyValuepair.Call<string> ("getValue");
-				dict.Add (key, value);
-			}
-
-			if (dict == null || dict.Count <= 0) 
-			{
-				return null;
-			}
-			return dict;
-		}
-
-		private static AndroidJavaObject GetAdobeEventFromACPExtensionEvent(ACPExtensionEvent acpExtensionEvent) {
-			if (acpExtensionEvent == null) 
-			{
-				return null;
-			}
-
-			using (AndroidJavaObject eventBuilder = new AndroidJavaObject("com.adobe.marketing.mobile.Event$Builder", acpExtensionEvent.eventName, acpExtensionEvent.eventType, acpExtensionEvent.eventSource)) 
-			{
-				if (acpExtensionEvent.eventData != null) {
-					using (var hashmap = GetHashMapFromDictionary(acpExtensionEvent.eventData)) {
-						eventBuilder.Call<AndroidJavaObject>("setEventData", hashmap);
-					}
-				}
-				
-				AndroidJavaObject eventObj = eventBuilder.Call<AndroidJavaObject>("build");
-				return eventObj;
-			}
-		}
-		#endif
 	}
 }
 
