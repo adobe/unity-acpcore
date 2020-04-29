@@ -86,10 +86,10 @@ namespace com.adobe.marketing.mobile
 		 * extern declarations for iOS Methods
 		 * =================================================================== */
 		[DllImport ("__Internal")]
-		private static extern System.IntPtr acp_ExtensionVersion();
+		private static extern System.IntPtr acp_Identity_ExtensionVersion();
 
 		[DllImport ("__Internal")]
-		private static extern void acp_AppendToUrl(AdobeIdentityAppendToUrlCallback callback);
+		private static extern void acp_AppendToUrl(string url, AdobeIdentityAppendToUrlCallback callback);
 
 		[DllImport ("__Internal")]
 		private static extern void acp_GetIdentifiers(AdobeGetIdentifiersCallback callback);
@@ -104,7 +104,7 @@ namespace com.adobe.marketing.mobile
 		private static extern void acp_SyncIdentifiers(string identifiers);
 
 		[DllImport ("__Internal")]
-		private static extern void acp_SyncIdentifiers(string identifiers, int authState);
+		private static extern void acp_SyncIdentifiersWithAuthState(string identifiers, int authState);
 
 		[DllImport ("__Internal")]
 		private static extern void acp_GetUrlVariables(AdobeGetUrlVariables callback);
@@ -130,7 +130,7 @@ namespace com.adobe.marketing.mobile
         public static string ExtensionVersion() 
 		{
 			#if UNITY_IPHONE && !UNITY_EDITOR		
-			return Marshal.PtrToStringAnsi(acp_ExtensionVersion());		
+			return Marshal.PtrToStringAnsi(acp_Identity_ExtensionVersion());		
 			#elif UNITY_ANDROID && !UNITY_EDITOR 
 			return identity.CallStatic<string> ("extensionVersion");
 			#else
@@ -150,6 +150,7 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR		
 			identity.CallStatic("appendVisitorInfoForURL", url, new IdentityAppendToUrlCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
+			acp_AppendToUrl(url, callback);
 			#endif
 		}
 
@@ -158,6 +159,7 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR		
 			identity.CallStatic("getIdentifiers", new GetIdentifiersCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
+			acp_GetIdentifiers(callback);
 			#endif
 		}
 
@@ -166,6 +168,7 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR		
 			identity.CallStatic("getExperienceCloudId", new GetExperienceCloudIdCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
+			acp_GetExperienceCloudIdCallback(callback);
 			#endif
 		}
 
@@ -178,6 +181,7 @@ namespace com.adobe.marketing.mobile
 				identity.CallStatic("syncIdentifier", identifierType, identifier, authStateObj);
 			}		
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
+			acp_SyncIdentifier(identifierType, identifier, (int)authState);
 			#endif
 		}
 
@@ -187,6 +191,7 @@ namespace com.adobe.marketing.mobile
 			AndroidJavaObject idMap = ACPHelpers.GetHashMapFromDictionary(ids);
 			identity.CallStatic("syncIdentifiers", idMap);
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
+			acp_SyncIdentifiers(ACPHelpers.JsonStringFromStringDictionary(ids));
 			#endif
 		}
 
@@ -200,6 +205,7 @@ namespace com.adobe.marketing.mobile
 				identity.CallStatic("syncIdentifiers", idMap, authStateObj);
 			}
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
+			acp_SyncIdentifiersWithAuthState(ACPHelpers.JsonStringFromStringDictionary(ids), (int)authenticationState);
 			#endif
 		}
 
@@ -208,6 +214,7 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			identity.CallStatic("getUrlVariables", new GetUrlVariables(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
+			acp_GetUrlVariables(callback);
 			#endif
 		}
 
