@@ -1,6 +1,18 @@
-﻿using System.Collections;
+﻿/*
+ACPIdentity.cs
+
+Copyright 2020 Adobe. All rights reserved.
+This file is licensed to you under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License. You may obtain a copy
+of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under
+the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+OF ANY KIND, either express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+*/
+
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace com.adobe.marketing.mobile
@@ -95,7 +107,7 @@ namespace com.adobe.marketing.mobile
 		private static extern void acp_GetIdentifiers(AdobeGetIdentifiersCallback callback);
 
 		[DllImport ("__Internal")]
-		private static extern void acp_GetExperienceCloudIdCallback(AdobeGetExperienceCloudIdCallback callback);
+		private static extern void acp_GetExperienceCloudId(AdobeGetExperienceCloudIdCallback callback);
 
 		[DllImport ("__Internal")]
 		private static extern void acp_SyncIdentifier(string identifierType, string identifier, int authState);
@@ -147,6 +159,10 @@ namespace com.adobe.marketing.mobile
 
 		public static void AppendToUrl(string url, AdobeIdentityAppendToUrlCallback callback) 
 		{
+			if (url == null || url.Length == 0) {
+				Debug.Log("Failed to perform AppendToUrl, url is null");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR		
 			identity.CallStatic("appendVisitorInfoForURL", url, new IdentityAppendToUrlCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
@@ -156,6 +172,10 @@ namespace com.adobe.marketing.mobile
 
 		public static void GetIdentifiers(AdobeGetIdentifiersCallback callback) 
 		{
+			if (callback == null) {
+				Debug.Log("Failed to perform GetIdentifiers, callback is null");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR		
 			identity.CallStatic("getIdentifiers", new GetIdentifiersCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
@@ -163,17 +183,27 @@ namespace com.adobe.marketing.mobile
 			#endif
 		}
 
-		public static void GetExperienceCloudIdCallback(AdobeGetExperienceCloudIdCallback callback) 
+		public static void GetExperienceCloudId(AdobeGetExperienceCloudIdCallback callback) 
 		{
+			if (callback == null) {
+				Debug.Log("Unable to perform GetExperienceCloudIdCallback, callback is null");
+				return;
+			}
+
 			#if UNITY_ANDROID && !UNITY_EDITOR		
 			identity.CallStatic("getExperienceCloudId", new GetExperienceCloudIdCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
-			acp_GetExperienceCloudIdCallback(callback);
+			acp_GetExperienceCloudId(callback);
 			#endif
 		}
 
 		public static void SyncIdentifier(string identifierType, string identifier, ACPAuthenticationState authState) 
 		{
+			if (identifierType == null || identifier == null) {
+				Debug.Log("Unable to perform SyncIdentifier, identifierType or identifier is null");
+				return;
+			}
+
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			using (var authStateClass = new AndroidJavaClass("com.adobe.marketing.mobile.VisitorID.AuthenticationState")) 
 			{
@@ -187,16 +217,31 @@ namespace com.adobe.marketing.mobile
 
 		public static void SyncIdentifiers(Dictionary<string, string> ids) 
 		{
+			if (ids == null) {
+				Debug.Log("Unable to perform SyncIdentifiers, ids are null");
+				return;
+			}
+
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject idMap = ACPHelpers.GetHashMapFromDictionary(ids);
 			identity.CallStatic("syncIdentifiers", idMap);
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
-			acp_SyncIdentifiers(ACPHelpers.JsonStringFromStringDictionary(ids));
+			string idsDict = ACPHelpers.JsonStringFromStringDictionary(ids);
+			if (idsDict == null) {
+				Debug.Log("Unable to perform SyncIdentifiers, ids are invalid");
+				return;
+			}
+			acp_SyncIdentifiers(idsDict);
 			#endif
 		}
 
 		public static void SyncIdentifiers(Dictionary<string, string> ids, ACPAuthenticationState authenticationState) 
 		{
+			if (ids == null) {
+				Debug.Log("Unable to perform SyncIdentifiers, ids are null");
+				return;
+			}
+
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			using (var authStateClass = new AndroidJavaClass("com.adobe.marketing.mobile.VisitorID.AuthenticationState")) 
 			{
@@ -205,12 +250,21 @@ namespace com.adobe.marketing.mobile
 				identity.CallStatic("syncIdentifiers", idMap, authStateObj);
 			}
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
-			acp_SyncIdentifiersWithAuthState(ACPHelpers.JsonStringFromStringDictionary(ids), (int)authenticationState);
+			string idsDict = ACPHelpers.JsonStringFromStringDictionary(ids);
+			if (idsDict == null) {
+				Debug.Log("Unable to perform SyncIdentifiers, ids are invalid");
+				return;
+			}
+			acp_SyncIdentifiersWithAuthState(idsDict, (int)authenticationState);
 			#endif
 		}
 
 		public static void GetUrlVariables(AdobeGetUrlVariables callback) 
 		{
+			if (callback == null) {
+				Debug.Log("Unable to perform GetUrlVariables, callback is null");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			identity.CallStatic("getUrlVariables", new GetUrlVariables(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR	

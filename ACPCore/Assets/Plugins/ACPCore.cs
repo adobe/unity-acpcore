@@ -1,10 +1,19 @@
-﻿using System.Collections;
+﻿/*
+ACPCore.cs
+
+Copyright 2020 Adobe. All rights reserved.
+This file is licensed to you under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License. You may obtain a copy
+of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under
+the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+OF ANY KIND, either express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+*/
+
 using System.Collections.Generic;
 using UnityEngine;
-using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-using AOT;
 
 namespace com.adobe.marketing.mobile
 {
@@ -245,6 +254,7 @@ namespace com.adobe.marketing.mobile
 			#endif
 		}
 
+
 		public static AndroidJavaObject GetApplication() 
 		{
 			#if UNITY_ANDROID && !UNITY_EDITOR			
@@ -276,7 +286,7 @@ namespace com.adobe.marketing.mobile
 			#elif UNITY_IPHONE && !UNITY_EDITOR
 			return ACPMobileLogLevelFromInt(acp_GetLogLevel());
 			#endif
-
+			
 			return ACPMobileLogLevel.UNKOWN;
 		}
 
@@ -289,6 +299,10 @@ namespace com.adobe.marketing.mobile
 		}
 
 		public static void ConfigureWithAppID(string appId) {
+			if (appId == null || appId.Length == 0) {
+				Debug.Log("Configuring with app id failed, app id is null or empty");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("configureWithAppID", appId);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
@@ -297,33 +311,69 @@ namespace com.adobe.marketing.mobile
 		}
 
 		public static void DispatchEvent(ACPExtensionEvent acpExtensionEvent, AdobeExtensionErrorCallback errorCallback) {
+			if (acpExtensionEvent == null) {
+				Debug.Log("Unable to perform DispatchEvent, acpExtensionEvent is null");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject eventObj = ACPHelpers.GetAdobeEventFromACPExtensionEvent(acpExtensionEvent);
 			mobileCore.CallStatic<Boolean>("dispatchEvent", eventObj, new ExtensionErrorCallback(errorCallback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
+			if (acpExtensionEvent.eventName == null || acpExtensionEvent.eventType == null || acpExtensionEvent.eventSource == null) {
+				Debug.Log("Unable to perform DispatchEvent, input params are null");
+				return;
+			}
 			string jsonDataEvent = ACPHelpers.JsonStringFromDictionary(acpExtensionEvent.eventData);
+			if (jsonDataEvent == null) {
+				Debug.Log("Unable to perform DispatchEvent, invalid event data");
+				return;
+			}
 			acp_DispatchEvent(acpExtensionEvent.eventName, acpExtensionEvent.eventType, acpExtensionEvent.eventSource, jsonDataEvent, errorCallback);
 			#endif
 		}
 
 		public static void DispatchEventWithResponseCallback(ACPExtensionEvent acpExtensionEvent, AdobeEventCallback responseCallback, AdobeExtensionErrorCallback errorCallback) {
+			if (acpExtensionEvent == null) {
+				Debug.Log("Unable to perform DispatchEventWithResponseCallback, acpExtensionEvent is null");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject eventObj = ACPHelpers.GetAdobeEventFromACPExtensionEvent(acpExtensionEvent);
 			mobileCore.CallStatic<Boolean>("dispatchEventWithResponseCallback", eventObj, new EventCallback(responseCallback), new ExtensionErrorCallback(errorCallback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
+			if (acpExtensionEvent.eventName ==null || acpExtensionEvent.eventType ==null || acpExtensionEvent.eventSource == null) {
+				Debug.Log("Unable to perform DispatchEventWithResponseCallback, input params are null");
+				return;
+			}
 			string jsonDataEvent = ACPHelpers.JsonStringFromDictionary(acpExtensionEvent.eventData);
+			if (jsonDataEvent == null) {
+				Debug.Log("Unable to perform DispatchEventWithResponseCallback, invalid event data");
+				return;
+			}
 			acp_DispatchEventWithResponseCallback(acpExtensionEvent.eventName, acpExtensionEvent.eventType, acpExtensionEvent.eventSource, jsonDataEvent, responseCallback, errorCallback);
 			#endif
 		}
 
 		public static void DispatchResponseEvent(ACPExtensionEvent responseEvent, ACPExtensionEvent requestEvent, AdobeExtensionErrorCallback errorCallback) {
+			if (responseEvent == null || requestEvent == null) {
+				Debug.Log("Unable to perform DispatchResponseEvent, responseEvent or requestEvent is null");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject responseEventObject = ACPHelpers.GetAdobeEventFromACPExtensionEvent(responseEvent);
 			AndroidJavaObject requestEventObject = ACPHelpers.GetAdobeEventFromACPExtensionEvent(requestEvent);
 			mobileCore.CallStatic<Boolean>("dispatchResponseEvent", responseEventObject, requestEventObject, new ExtensionErrorCallback(errorCallback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
+			if (responseEvent.eventName == null || responseEvent.eventType == null || responseEvent.eventSource == null || requestEvent.eventName == null || requestEvent.eventType == null || requestEvent.eventSource == null) {
+				Debug.Log("Unable to perform DispatchResponseEvent, input params are null");
+				return;
+			}
 			string responseJsonDataEvent = ACPHelpers.JsonStringFromDictionary(responseEvent.eventData);
 			string requestJsonDataEvent = ACPHelpers.JsonStringFromDictionary(requestEvent.eventData);
+			if (responseJsonDataEvent == null || requestJsonDataEvent == null) {
+				Debug.Log("Unable to perform DispatchResponseEvent, responseEventData or requestEventData is invalid");
+				return;
+			}
 			acp_DispatchResponseEvent(responseEvent.eventName, responseEvent.eventType, responseEvent.eventSource, responseJsonDataEvent,
 			requestEvent.eventName, requestEvent.eventType, requestEvent.eventSource, requestJsonDataEvent, errorCallback);
 			#endif
@@ -345,11 +395,15 @@ namespace com.adobe.marketing.mobile
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("setAdvertisingIdentifier", adId);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			acp_SetAdvertisingIdentifier(adId);
+			acp_SetAdvertisingIdentifier(adId == null ? "" : adId);
 			#endif
 		}
 
 		public static void GetSdkIdentities(AdobeIdentitiesCallback callback) {
+			if (callback == null) {
+				Debug.Log("Unable to perform GetSdkIdentities, callback is null");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("getSdkIdentities", new IdentitiesCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
@@ -358,6 +412,10 @@ namespace com.adobe.marketing.mobile
 		}
 
 		public static void GetPrivacyStatus(AdobePrivacyStatusCallback callback) {
+			if (callback == null) {
+				Debug.Log("Unable to perform GetPrivacyStatus, callback is null");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			mobileCore.CallStatic("getPrivacyStatus", new PrivacyStatusCallback(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR
@@ -378,38 +436,78 @@ namespace com.adobe.marketing.mobile
 		}
 
 		public static void UpdateConfiguration(Dictionary<string, object> config) {
+			if (config == null) {
+				Debug.Log("Unable to perform UpdateConfiguration, invalid config");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			var map = ACPHelpers.GetHashMapFromDictionary(config);
 			mobileCore.CallStatic("updateConfiguration", map);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
+			string cData = ACPHelpers.JsonStringFromDictionary(config);
+			if (cData == null) {
+				Debug.Log("Unable to perform UpdateConfiguration, invalid config");
+				return;
+			}
 			acp_UpdateConfiguration(ACPHelpers.JsonStringFromDictionary(config));
 			#endif
 		}
 
 		public static void TrackState(string name, Dictionary<string, string> contextDataDict) {
+			if (name == null || contextDataDict == null) {
+				Debug.Log("Unable to perform track state, invalid input");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject contextData = ACPHelpers.GetStringHashMapFromDictionary(contextDataDict);
 			mobileCore.CallStatic("trackState", name, contextData);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			acp_TrackState(name, ACPHelpers.JsonStringFromStringDictionary(contextDataDict));
+			string cData = ACPHelpers.JsonStringFromStringDictionary(contextDataDict);
+			if (cData == null) {
+				Debug.Log("Unable to perform track state, contextDataDict is invalid");
+				return;
+			}
+			acp_TrackState(name, cData);
 			#endif
 		}
 
 		public static void TrackAction(string name, Dictionary<string, string> contextDataDict) {
+			if (name == null || contextDataDict == null) {
+				Debug.Log("Unable to perform track action, invalid input");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject contextData = ACPHelpers.GetStringHashMapFromDictionary(contextDataDict);
 			mobileCore.CallStatic("trackAction", name, contextData);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			acp_TrackAction(name, ACPHelpers.JsonStringFromStringDictionary(contextDataDict));
+			string cData = ACPHelpers.JsonStringFromStringDictionary(contextDataDict);
+			if (cData == null) {
+				Debug.Log("Unable to perform track action, contextDataDict is invalid");
+				return;
+			}
+			acp_TrackAction(name, cData);
 			#endif
 		}
 
 		public static void LifecycleStart(Dictionary<string, string> additionalContextData) {
+			if (additionalContextData == null) {
+				Debug.Log ("Unable to perform LifecycleStart, context data is null");
+				return;
+			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject contextData = ACPHelpers.GetStringHashMapFromDictionary(additionalContextData);
+			if (jsonContextData == null) {
+				Debug.Log ("Unable to perform LifecycleStart, invalid context data");
+				return;
+			}
 			mobileCore.CallStatic("lifecycleStart", contextData);
 			#elif UNITY_IPHONE && !UNITY_EDITOR
-			acp_LifecycleStart(ACPHelpers.JsonStringFromStringDictionary(additionalContextData));
+			string jsonContextData = ACPHelpers.JsonStringFromStringDictionary(additionalContextData);
+			if (jsonContextData == null) {
+				Debug.Log ("Unable to perform LifecycleStart, invalid context data");
+				return;
+			}
+			acp_LifecycleStart(jsonContextData);
 			#endif
 		}
 

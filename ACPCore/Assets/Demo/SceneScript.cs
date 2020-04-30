@@ -1,4 +1,18 @@
-﻿using System.Collections;
+﻿/*
+Copyright 2020 Adobe
+All Rights Reserved.
+
+NOTICE: Adobe permits you to use, modify, and distribute this file in
+accordance with the terms of the Adobe license agreement accompanying
+it. If you have received this file from a source other than Adobe,
+then your use, modification, or distribution of it requires the prior
+written permission of Adobe.
+
+This file has been modified from its original form. The original
+license can be viewed in the NOTICES.txt file.
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -100,8 +114,11 @@ public class SceneScript : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {
-        ACPCore.SetApplication();
+    {   
+        if (Application.platform == RuntimePlatform.Android) {
+            ACPCore.SetApplication();
+        }
+        
         ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.VERBOSE);
         ACPIdentity.registerExtension();
         ACPCore.Start(HandleStartAdobeCallback);
@@ -278,7 +295,7 @@ public class SceneScript : MonoBehaviour
     }
 
     void getExperienceCloudId() {
-        ACPIdentity.GetExperienceCloudIdCallback(HandleAdobeGetExperienceCloudIdCallback);
+        ACPIdentity.GetExperienceCloudId(HandleAdobeGetExperienceCloudIdCallback);
     }
 
     void syncIdentifier() {

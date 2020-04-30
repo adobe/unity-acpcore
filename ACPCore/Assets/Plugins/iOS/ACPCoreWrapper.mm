@@ -1,3 +1,16 @@
+/*
+ACPCoreWrapper.mm
+
+Copyright 2020 Adobe. All rights reserved.
+This file is licensed to you under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License. You may obtain a copy
+of the License at http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software distributed under
+the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+OF ANY KIND, either express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+*/
+
 #import "ACPCoreWrapper.h"
 #import "ACPCore.h"
 #import "ACPExtensionEvent.h"
@@ -19,7 +32,9 @@ int acp_GetLogLevel() {
 
 void acp_Start(void (*callback)()) {
     [ACPCore start:^{
-        callback();
+        if (callback != null) {
+            callback();
+        }
     }];
 }
 
@@ -32,9 +47,13 @@ void acp_DispatchEvent(const char *eventName, const char *eventType, const char 
     ACPExtensionEvent *event = _getACPExtensionEventFromData(eventName, eventType, eventSource, cData);
     NSError* error = nil;
     if ([ACPCore dispatchEvent:event error:&error]) {
-        errorCallback("", 0);
+        if (errorCallback != null) {
+            errorCallback("", 0);
+        }
     } else {
-        errorCallback([error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding], (int)error.code);
+        if (errorCallback != null) {
+            errorCallback([error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding], (int)error.code);
+        }
     }
 }
 
@@ -42,16 +61,21 @@ void acp_DispatchEventWithResponseCallback(const char *eventName, const char *ev
     ACPExtensionEvent *event = _getACPExtensionEventFromData(eventName, eventType, eventSource, cData);
     NSError* error = nil;
     if ([ACPCore dispatchEventWithResponseCallback:event responseCallback:^(ACPExtensionEvent * _Nonnull responseEvent) {
-        
-        responseCallback([responseEvent.eventName cStringUsingEncoding:NSUTF8StringEncoding],
+        if (responseCallback != null) {
+            responseCallback([responseEvent.eventName cStringUsingEncoding:NSUTF8StringEncoding],
                          [responseEvent.eventType cStringUsingEncoding:NSUTF8StringEncoding],
                          [responseEvent.eventSource cStringUsingEncoding:NSUTF8StringEncoding],
                          [_jsonStringWithPrettyPrint(responseEvent.eventData, error) cStringUsingEncoding:NSUTF8StringEncoding]);
+        }
     } error:&error]) {
         // nothing
-        errorCallback("", 0);
+        if (errorCallback != null) {
+            errorCallback("", 0);
+        }
     } else {
-        errorCallback([error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding], (int)error.code);
+        if (errorCallback != null) {
+            errorCallback([error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding], (int)error.code);
+        }
     }
 }
 
@@ -76,13 +100,17 @@ void acp_SetAdvertisingIdentifier(const char *adId) {
 }
 void acp_GetSdkIdentities(void (*callback)(const char *ids)) {
     [ACPCore getSdkIdentities:^(NSString * _Nullable content) {
-        callback([content cStringUsingEncoding:NSUTF8StringEncoding]);
+        if (callback != null) {
+            callback([content cStringUsingEncoding:NSUTF8StringEncoding]);
+        }
     }];
 }
 
 void acp_GetPrivacyStatus(void (*callback)(int status)) {
     [ACPCore getPrivacyStatus:^(ACPMobilePrivacyStatus status) {
-        callback((int)status);
+        if (callback != null) {
+            callback((int)status);
+        }
     }];
 }
 
@@ -95,12 +123,12 @@ void acp_UpdateConfiguration(const char *cdataString) {
 }
 
 void acp_TrackState(const char *name, const char *cdataString) {
-    NSString *nameString = cdataString ? [NSString stringWithCString:cdataString encoding:NSUTF8StringEncoding] : nil;
+    NSString *nameString = name ? [NSString stringWithCString:name encoding:NSUTF8StringEncoding] : nil;
     [ACPCore trackState:nameString data:_getDictionaryFromJsonString(cdataString)];
 }
 
 void acp_TrackAction(const char *name, const char *cdataString) {
-    NSString *nameString = cdataString ? [NSString stringWithCString:cdataString encoding:NSUTF8StringEncoding] : nil;
+    NSString *nameString = name ? [NSString stringWithCString:name encoding:NSUTF8StringEncoding] : nil;
     [ACPCore trackAction:nameString data:_getDictionaryFromJsonString(cdataString)];
 }
 
