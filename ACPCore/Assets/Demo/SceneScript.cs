@@ -96,7 +96,7 @@ public class SceneScript : MonoBehaviour
     [MonoPInvokeCallback(typeof(AdobeGetExperienceCloudIdCallback))]
     public static void HandleAdobeGetExperienceCloudIdCallback(string cloudId)
     {
-        print("Cloud id is : " + cloudId);
+        print("ECID is : " + cloudId);
     }
 
     [MonoPInvokeCallback(typeof(AdobeGetUrlVariables))]
