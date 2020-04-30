@@ -1,10 +1,16 @@
-//
-//  ACPCore.h
-//  Adobe Experience Platform -- iOS Framework
-//
-//  Copyright 1996-2019. Adobe. All Rights Reserved
-//
-//  Core Version: 2.2.1
+/*
+Copyright 2020 Adobe. All rights reserved.
+This file is licensed to you under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License. You may obtain a copy
+of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under
+the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+OF ANY KIND, either express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+
+Core Version: 2.6.1
+*/
 
 #import <Foundation/Foundation.h>
 
@@ -64,7 +70,11 @@ typedef NS_ENUM(NSUInteger, ACPMobileVisitorAuthenticationState) {
  */
 typedef NS_ENUM(NSUInteger, ACPMobileWrapperType) {
     ACPMobileWrapperTypeNone = 0, /*!< Enum value ACPMobileWrapperTypeNone. */
-    ACPMobileWrapperTypeReactNative = 1 /*!< Enum value ACPMobileWrapperTypeReactNative. */
+    ACPMobileWrapperTypeReactNative = 1, /*!< Enum value ACPMobileWrapperTypeReactNative. */
+    ACPMobileWrapperTypeFlutter = 2, /*!< Enum value ACPMobileWrapperTypeFlutter. */
+    ACPMobileWrapperTypeCordova = 3, /*!< Enum value ACPMobileWrapperTypeCordova. */
+    ACPMobileWrapperTypeUnity = 4, /*!< Enum value ACPMobileWrapperTypeUnity. */
+    ACPMobileWrapperTypeXamarin = 5 /*!< Enum value ACPMobileWrapperTypeXamarin. */
 };
 
 #pragma mark - Configuration
@@ -113,16 +123,28 @@ typedef NS_ENUM(NSUInteger, ACPMobileWrapperType) {
 
 /**
  * @brief Calls the provided callback with a JSON string containing all of the user's identities known by the SDK
+ *
  * @param callback a void-returning method that has an NSString param containing a JSON string
  */
 + (void) getSdkIdentities: (nullable void (^) (NSString* __nullable content)) callback;
+
+/**
+ * @brief Get a JSON string containing all of the user's identities known by the SDK  and calls a handler upon completion.
+ *
+ * @param completionHandler a void-returning method that has an NSString param containing a JSON string, and an NSError param if the request failed
+ */
+
++ (void) getSdkIdentitiesWithCompletionHandler: (nullable void (^) (NSString* __nullable content, NSError* _Nullable error)) completionHandler;
 
 /**
  * @brief Set the provided callback with a url string and call this callback function before SDK extension open url action
  *
  * @param callback a method that has an string param containing a url, which return YES if it will handle the provided url, NO continue to open url.
  */
+#if !TARGET_OS_WATCH
 + (void) registerURLHandler: (nonnull BOOL (^) (NSString* __nullable url)) callback;
+#endif
+
 /**
  * @brief Get the current Adobe Mobile Privacy Status
  *
@@ -132,6 +154,16 @@ typedef NS_ENUM(NSUInteger, ACPMobileWrapperType) {
  * @see ACPMobilePrivacyStatus
  */
 + (void) getPrivacyStatus: (nonnull void (^) (ACPMobilePrivacyStatus status)) callback;
+
+/**
+ * @brief Get the current Adobe Mobile Privacy Status  and calls a handler upon completion.
+ *
+ * Gets the currently configured \ref ACPMobilePrivacyStatus and passes it as a parameter to the given void function.
+ *
+ * @param completionHandler method invoked with the configured privacy status as a parameter, and an NSError param if the request failed
+ * @see ACPMobilePrivacyStatus
+ */
++ (void) getPrivacyStatusWithCompletionHandler: (nonnull void (^) (ACPMobilePrivacyStatus status, NSError* _Nullable error)) completionHandler;
 
 /**
  * @brief Returns the current version of the ACPCore Extension.
@@ -350,6 +382,23 @@ typedef NS_ENUM(NSUInteger, ACPMobileWrapperType) {
  * @param userInfo Dictionary of data relevant to the expected use case
  */
 + (void) collectLaunchInfo: (nonnull NSDictionary*) userInfo;
+
+/**
+ * @brief Provide message info to the SDK from various points in your application.
+ *
+ * This method should be called to support the following use cases:
+ *
+ *  1. Tracking remote or local notification receive
+ *     - call from userNotificationCenter:willPresentNotification:withCompletionHandler:
+ *
+ *  2. Tracking remote or local notification click-throughs
+ *     - call from userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:
+ *
+ * For scenarios where the app is launched as a result of notification click, use ACPCore::collectLaunchInfo:
+ *
+ * @param messageInfo Dictionary of data relevant to the expected use case
+ */
++ (void) collectMessageInfo: (nonnull NSDictionary*) messageInfo;
 
 #pragma mark - Rules Engine
 

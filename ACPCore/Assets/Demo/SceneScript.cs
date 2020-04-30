@@ -1,4 +1,15 @@
-﻿using System.Collections;
+﻿/*
+Copyright 2020 Adobe
+All Rights Reserved.
+
+NOTICE: Adobe permits you to use, modify, and distribute this file in
+accordance with the terms of the Adobe license agreement accompanying
+it. If you have received this file from a source other than Adobe,
+then your use, modification, or distribution of it requires the prior
+written permission of Adobe.
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -66,11 +77,7 @@ public class SceneScript : MonoBehaviour
     [MonoPInvokeCallback(typeof(AdobeStartCallback))]
     public static void HandleStartAdobeCallback()
     {   
-        if (Application.platform == RuntimePlatform.Android) {
-            ACPCore.ConfigureWithAppID("launch-ENc28aaf2fb6934cff830c8d3ddc5465b1-development");    
-        } else if (Application.platform == RuntimePlatform.IPhonePlayer) {
-            print("HandleStartAdobeCallback iphone");
-        }
+        ACPCore.ConfigureWithAppID("launch-ENc28aaf2fb6934cff830c8d3ddc5465b1-development"); 
     }
 
     // Identity Callbacks
@@ -89,7 +96,7 @@ public class SceneScript : MonoBehaviour
     [MonoPInvokeCallback(typeof(AdobeGetExperienceCloudIdCallback))]
     public static void HandleAdobeGetExperienceCloudIdCallback(string cloudId)
     {
-        print("Url is : " + cloudId);
+        print("ECID is : " + cloudId);
     }
 
     [MonoPInvokeCallback(typeof(AdobeGetUrlVariables))]
@@ -100,8 +107,11 @@ public class SceneScript : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {
-        ACPCore.SetApplication();
+    {   
+        if (Application.platform == RuntimePlatform.Android) {
+            ACPCore.SetApplication();
+        }
+        
         ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.VERBOSE);
         ACPIdentity.registerExtension();
         ACPCore.Start(HandleStartAdobeCallback);
@@ -172,7 +182,7 @@ public class SceneScript : MonoBehaviour
     void setLogLevel()
     {
         print("Setting Log Level");
-        ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.ERROR);
+        ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.DEBUG);
     }
 
     void getLogLevel()
@@ -278,7 +288,7 @@ public class SceneScript : MonoBehaviour
     }
 
     void getExperienceCloudId() {
-        ACPIdentity.GetExperienceCloudIdCallback(HandleAdobeGetExperienceCloudIdCallback);
+        ACPIdentity.GetExperienceCloudId(HandleAdobeGetExperienceCloudIdCallback);
     }
 
     void syncIdentifier() {
