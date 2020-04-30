@@ -35,15 +35,15 @@ const char *acp_Identity_ExtensionVersion() {
 
 void acp_AppendToUrl(const char *url, void (*callback)(const char *url)) {
     NSString *stringUrl = [NSString stringWithCString:url encoding:NSUTF8StringEncoding];
-    if (!adIdString.length) {
-        if (callback != null) {
+    if (!stringUrl.length) {
+        if (callback != nil) {
             callback([@"" cStringUsingEncoding:NSUTF8StringEncoding]);
         }
         return;
     }
     NSURL *nsurl = [NSURL URLWithString:stringUrl];
     [ACPIdentity appendToUrl:nsurl withCallback:^(NSURL * _Nullable urlWithVisitorData) {
-        if (callback != null) {
+        if (callback != nil) {
             callback([urlWithVisitorData.absoluteString cStringUsingEncoding:NSUTF8StringEncoding]);
         }
     }];
@@ -61,7 +61,7 @@ void acp_GetIdentifiers(void (*callback)(const char *ids)) {
         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:visitorIDList options:NSJSONWritingPrettyPrinted error:&error];
         NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         NSLog(@"jsonData as string:\n%@", jsonString);
-        if (callback != null) {
+        if (callback != nil) {
             callback([jsonString cStringUsingEncoding:NSUTF8StringEncoding]);
         }
     }];
@@ -86,13 +86,13 @@ void acp_SyncIdentifier(const char *identifierType, const char *identifier, int 
 
 void acp_SyncIdentifiers(const char *identifiers) {
     NSDictionary *dict = getDictionaryFromJsonString(identifiers);
-    if (dict == null) return;
+    if (dict == nil) return;
     [ACPIdentity syncIdentifiers:dict];
 }
 
 void acp_SyncIdentifiersWithAuthState(const char *identifiers, int authState) {
     NSDictionary *nsIdentifiers = getDictionaryFromJsonString(identifiers);
-    if (nsIdentifiers == null) return;
+    if (nsIdentifiers == nil) return;
     ACPMobileVisitorAuthenticationState authenticationState = ACPMobileVisitorAuthenticationState(authState);
     [ACPIdentity syncIdentifiers:nsIdentifiers authentication:authenticationState];
 }
@@ -127,7 +127,7 @@ NSString *stringFromAuthState(ACPMobileVisitorAuthenticationState authState) {
 }
 
 NSDictionary *getDictionaryFromJsonString(const char *jsonString) {
-    if (!jsonString.length) {
+    if (!jsonString) {
         return nil;
     }
     

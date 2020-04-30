@@ -32,7 +32,7 @@ int acp_GetLogLevel() {
 
 void acp_Start(void (*callback)()) {
     [ACPCore start:^{
-        if (callback != null) {
+        if (callback != nil) {
             callback();
         }
     }];
@@ -51,11 +51,11 @@ void acp_DispatchEvent(const char *eventName, const char *eventType, const char 
     ACPExtensionEvent *event = _getACPExtensionEventFromData(eventName, eventType, eventSource, cData);
     NSError* error = nil;
     if ([ACPCore dispatchEvent:event error:&error]) {
-        if (errorCallback != null) {
+        if (errorCallback != nil) {
             errorCallback("", 0);
         }
     } else {
-        if (errorCallback != null) {
+        if (errorCallback != nil) {
             errorCallback([error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding], (int)error.code);
         }
     }
@@ -65,7 +65,7 @@ void acp_DispatchEventWithResponseCallback(const char *eventName, const char *ev
     ACPExtensionEvent *event = _getACPExtensionEventFromData(eventName, eventType, eventSource, cData);
     NSError* error = nil;
     if ([ACPCore dispatchEventWithResponseCallback:event responseCallback:^(ACPExtensionEvent * _Nonnull responseEvent) {
-        if (responseCallback != null) {
+        if (responseCallback != nil) {
             responseCallback([responseEvent.eventName cStringUsingEncoding:NSUTF8StringEncoding],
                          [responseEvent.eventType cStringUsingEncoding:NSUTF8StringEncoding],
                          [responseEvent.eventSource cStringUsingEncoding:NSUTF8StringEncoding],
@@ -73,11 +73,11 @@ void acp_DispatchEventWithResponseCallback(const char *eventName, const char *ev
         }
     } error:&error]) {
         // nothing
-        if (errorCallback != null) {
+        if (errorCallback != nil) {
             errorCallback("", 0);
         }
     } else {
-        if (errorCallback != null) {
+        if (errorCallback != nil) {
             errorCallback([error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding], (int)error.code);
         }
     }
@@ -108,7 +108,7 @@ void acp_SetAdvertisingIdentifier(const char *adId) {
 }
 void acp_GetSdkIdentities(void (*callback)(const char *ids)) {
     [ACPCore getSdkIdentities:^(NSString * _Nullable content) {
-        if (callback != null) {
+        if (callback != nil) {
             callback([content cStringUsingEncoding:NSUTF8StringEncoding]);
         }
     }];
@@ -116,7 +116,7 @@ void acp_GetSdkIdentities(void (*callback)(const char *ids)) {
 
 void acp_GetPrivacyStatus(void (*callback)(int status)) {
     [ACPCore getPrivacyStatus:^(ACPMobilePrivacyStatus status) {
-        if (callback != null) {
+        if (callback != nil) {
             callback((int)status);
         }
     }];

@@ -80,11 +80,7 @@ public class SceneScript : MonoBehaviour
     [MonoPInvokeCallback(typeof(AdobeStartCallback))]
     public static void HandleStartAdobeCallback()
     {   
-        if (Application.platform == RuntimePlatform.Android) {
-            ACPCore.ConfigureWithAppID("launch-ENc28aaf2fb6934cff830c8d3ddc5465b1-development");    
-        } else if (Application.platform == RuntimePlatform.IPhonePlayer) {
-            print("HandleStartAdobeCallback iphone");
-        }
+        ACPCore.ConfigureWithAppID("launch-ENc28aaf2fb6934cff830c8d3ddc5465b1-development"); 
     }
 
     // Identity Callbacks
@@ -189,7 +185,7 @@ public class SceneScript : MonoBehaviour
     void setLogLevel()
     {
         print("Setting Log Level");
-        ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.ERROR);
+        ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.DEBUG);
     }
 
     void getLogLevel()
