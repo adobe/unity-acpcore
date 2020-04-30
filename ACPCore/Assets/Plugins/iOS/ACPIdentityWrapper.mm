@@ -34,8 +34,8 @@ const char *acp_Identity_ExtensionVersion() {
 }
 
 void acp_AppendToUrl(const char *url, void (*callback)(const char *url)) {
-    NSString *stringUrl = url ? [NSString stringWithCString:url encoding:NSUTF8StringEncoding] : nil;
-    if (stringUrl == nil) {
+    NSString *stringUrl = [NSString stringWithCString:url encoding:NSUTF8StringEncoding];
+    if (!adIdString.length) {
         if (callback != null) {
             callback([@"" cStringUsingEncoding:NSUTF8StringEncoding]);
         }
@@ -76,6 +76,10 @@ void acp_GetExperienceCloudId(void (*callback)(const char *cloudId)) {
 void acp_SyncIdentifier(const char *identifierType, const char *identifier, int authState) {
     NSString *nsIdType = [NSString stringWithCString:identifierType encoding:NSUTF8StringEncoding];
     NSString *nsId = [NSString stringWithCString:identifier encoding:NSUTF8StringEncoding];
+    if (!nsIdType.length || !nsId.length) {
+        NSLog(@"SyncIdentifier failed as type or id are null");
+        return;
+    }
     ACPMobileVisitorAuthenticationState authenticationState = (ACPMobileVisitorAuthenticationState)authState;
     [ACPIdentity syncIdentifier:nsIdType identifier:nsId authentication:authenticationState];
 }
@@ -123,7 +127,7 @@ NSString *stringFromAuthState(ACPMobileVisitorAuthenticationState authState) {
 }
 
 NSDictionary *getDictionaryFromJsonString(const char *jsonString) {
-    if (!jsonString) {
+    if (!jsonString.length) {
         return nil;
     }
     

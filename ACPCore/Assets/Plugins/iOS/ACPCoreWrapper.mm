@@ -39,8 +39,12 @@ void acp_Start(void (*callback)()) {
 }
 
  void acp_ConfigureWithAppID(const char *appId) {
-     NSString *appIdString = appId ? [NSString stringWithCString:appId encoding:NSUTF8StringEncoding] : nil;
-     [ACPCore configureWithAppId:appIdString];
+    NSString *appIdString = [NSString stringWithCString:appId encoding:NSUTF8StringEncoding];
+    if (!appIdString.length) {
+        NSLog(@"appIdString is empty or nil");
+    } else {
+        [ACPCore configureWithAppId:appIdString];
+    }
  }
 
 void acp_DispatchEvent(const char *eventName, const char *eventType, const char *eventSource, const char *cData, void (*errorCallback)(const char *errorName, int errorCode)) {
@@ -95,8 +99,12 @@ void acp_SetPrivacyStatus(int privacyStatus) {
 }
 
 void acp_SetAdvertisingIdentifier(const char *adId) {
-    NSString *adIdString = adId ? [NSString stringWithCString:adId encoding:NSUTF8StringEncoding] : nil;
-    [ACPCore setAdvertisingIdentifier:adIdString];
+    NSString *adIdString = [NSString stringWithCString:adId encoding:NSUTF8StringEncoding];
+    if (!adIdString.length) {
+        NSLog(@"adIdString is empty or nil");
+    } else {
+        [ACPCore setAdvertisingIdentifier:adIdString];
+    }
 }
 void acp_GetSdkIdentities(void (*callback)(const char *ids)) {
     [ACPCore getSdkIdentities:^(NSString * _Nullable content) {
@@ -123,13 +131,21 @@ void acp_UpdateConfiguration(const char *cdataString) {
 }
 
 void acp_TrackState(const char *name, const char *cdataString) {
-    NSString *nameString = name ? [NSString stringWithCString:name encoding:NSUTF8StringEncoding] : nil;
-    [ACPCore trackState:nameString data:_getDictionaryFromJsonString(cdataString)];
+    NSString *nameString = [NSString stringWithCString:name encoding:NSUTF8StringEncoding];
+    if (!nameString.length) {
+        NSLog(@"nameString is empty or nil");
+    } else {
+        [ACPCore trackState:nameString data:_getDictionaryFromJsonString(cdataString)];
+    }
 }
 
 void acp_TrackAction(const char *name, const char *cdataString) {
-    NSString *nameString = name ? [NSString stringWithCString:name encoding:NSUTF8StringEncoding] : nil;
-    [ACPCore trackAction:nameString data:_getDictionaryFromJsonString(cdataString)];
+    NSString *nameString = [NSString stringWithCString:name encoding:NSUTF8StringEncoding];
+    if (!nameString.length) {
+        NSLog(@"nameString is empty or nil");
+    } else {
+        [ACPCore trackAction:nameString data:_getDictionaryFromJsonString(cdataString)];
+    }
 }
 
 void acp_LifecycleStart(const char *cdataString) {
