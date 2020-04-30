@@ -500,7 +500,7 @@ namespace com.adobe.marketing.mobile
 			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
 			AndroidJavaObject contextData = ACPHelpers.GetStringHashMapFromDictionary(additionalContextData);
-			if (jsonContextData == null) {
+			if (contextData == null) {
 				Debug.Log ("Unable to perform LifecycleStart, invalid context data");
 				return;
 			}

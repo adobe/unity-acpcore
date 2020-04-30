@@ -209,7 +209,7 @@ namespace com.adobe.marketing.mobile
 			}
 
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			using (var authStateClass = new AndroidJavaClass("com.adobe.marketing.mobile.VisitorID.AuthenticationState")) 
+			using (var authStateClass = new AndroidJavaClass("com.adobe.marketing.mobile.VisitorID$AuthenticationState")) 
 			{
 				var authStateObj = authStateClass.GetStatic<AndroidJavaObject>(authState.ToString());
 				identity.CallStatic("syncIdentifier", identifierType, identifier, authStateObj);
@@ -227,7 +227,7 @@ namespace com.adobe.marketing.mobile
 			}
 
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			AndroidJavaObject idMap = ACPHelpers.GetHashMapFromDictionary(ids);
+			AndroidJavaObject idMap = ACPHelpers.GetStringHashMapFromDictionary(ids);
 			identity.CallStatic("syncIdentifiers", idMap);
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
 			string idsDict = ACPHelpers.JsonStringFromStringDictionary(ids);
@@ -247,10 +247,10 @@ namespace com.adobe.marketing.mobile
 			}
 
 			#if UNITY_ANDROID && !UNITY_EDITOR
-			using (var authStateClass = new AndroidJavaClass("com.adobe.marketing.mobile.VisitorID.AuthenticationState")) 
+			using (var authStateClass = new AndroidJavaClass("com.adobe.marketing.mobile.VisitorID$AuthenticationState")) 
 			{
 				var authStateObj = authStateClass.GetStatic<AndroidJavaObject>(authenticationState.ToString());
-				AndroidJavaObject idMap = ACPHelpers.GetHashMapFromDictionary(ids);
+				AndroidJavaObject idMap = ACPHelpers.GetStringHashMapFromDictionary(ids);
 				identity.CallStatic("syncIdentifiers", idMap, authStateObj);
 			}
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
@@ -288,7 +288,7 @@ namespace com.adobe.marketing.mobile
 			dict.Add("idOrigin", visitorId.Call<string>("getIdOrigin"));
 			dict.Add("idType", visitorId.Call<string>("getIdType"));
 			dict.Add("identifier", visitorId.Call<string>("getId"));
-			dict.Add("authenticationState", ACPIdentity.stringFromAuthState(visitorId.Call<AndroidJavaObject>("authenticationState")));
+			dict.Add("authenticationState", ACPIdentity.stringFromAuthState(visitorId.Call<AndroidJavaObject>("getAuthenticationState")));
 			return dict;
 		 }
 
@@ -296,11 +296,11 @@ namespace com.adobe.marketing.mobile
 			if (authState == null) {
 				return "ACP_VISITOR_AUTH_STATE_UNKNOWN";
 			}
-			using (var authStateObj = new AndroidJavaClass("com.adobe.marketing.mobile.VisitorID.AuthenticationState"))
+			using (var authStateObj = new AndroidJavaClass("com.adobe.marketing.mobile.VisitorID$AuthenticationState"))
 			{
-				if (authState.Call<int>("ordinal") == (authStateObj.CallStatic<AndroidJavaObject>("AUTHENTICATED")).Call<int>("ordinal")) {
+				if (authState.Call<int>("ordinal") == (authStateObj.GetStatic<AndroidJavaObject>("AUTHENTICATED")).Call<int>("ordinal")) {
 					return "ACP_VISITOR_AUTH_STATE_AUTHENTICATED";
-				} else if(authState.Call<int>("ordinal") == (authStateObj.CallStatic<AndroidJavaObject>("LOGGED_OUT")).Call<int>("ordinal")) {
+				} else if(authState.Call<int>("ordinal") == (authStateObj.GetStatic<AndroidJavaObject>("LOGGED_OUT")).Call<int>("ordinal")) {
 					return "ACP_VISITOR_AUTH_STATE_LOGGED_OUT";
 				}
 			}
