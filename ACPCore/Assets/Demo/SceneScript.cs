@@ -114,6 +114,8 @@ public class SceneScript : MonoBehaviour
         
         ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.VERBOSE);
         ACPIdentity.registerExtension();
+        ACPLifecycle.registerExtension();
+        ACPSignal.registerExtension();
         ACPCore.Start(HandleStartAdobeCallback);
 
         // Core
@@ -162,8 +164,14 @@ public class SceneScript : MonoBehaviour
     // Core Methods
     void coreExtensionVersion()
     {
-        string version = ACPCore.ExtensionVersion();
-        print(version);
+        string coreVersion = ACPCore.ExtensionVersion();
+        string identityVersion = ACPIdentity.ExtensionVersion();
+        string lifecycleVersion = ACPLifecycle.ExtensionVersion();
+        string signalVersion = ACPSignal.ExtensionVersion();
+        print("coreVersion - " + coreVersion);
+        print("identityVersion - " + identityVersion);
+        print("lifecycleVersion - " + lifecycleVersion);
+        print("signalVersion - " + signalVersion);
     }
 
     void setApplication()

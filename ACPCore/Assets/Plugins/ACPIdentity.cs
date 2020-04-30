@@ -105,6 +105,9 @@ namespace com.adobe.marketing.mobile
 		private static extern System.IntPtr acp_Identity_ExtensionVersion();
 
 		[DllImport ("__Internal")]
+		private static extern void acp_Identity_RegisterExtension();
+
+		[DllImport ("__Internal")]
 		private static extern void acp_AppendToUrl(string url, AdobeIdentityAppendToUrlCallback callback);
 
 		[DllImport ("__Internal")]
@@ -155,7 +158,8 @@ namespace com.adobe.marketing.mobile
 		}
 
 		public static void registerExtension() {
-			#if UNITY_IPHONE && !UNITY_EDITOR		
+			#if UNITY_IPHONE && !UNITY_EDITOR	
+			acp_Identity_RegisterExtension();
 			#elif UNITY_ANDROID && !UNITY_EDITOR 
 			identity.CallStatic("registerExtension");
 			#endif

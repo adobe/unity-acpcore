@@ -16,6 +16,7 @@ governing permissions and limitations under the License.
 
 extern "C" {
     const char *acp_Identity_ExtensionVersion();
+    void acp_Identity_RegisterExtension();
     void acp_AppendToUrl(const char *url, void (*callback)(const char *url));
     void acp_GetIdentifiers(void (*callback)(const char *ids));
     void acp_GetExperienceCloudId(void (*callback)(const char *cloudId));
