@@ -1,5 +1,5 @@
 /*
-ACPExtensionEvent.mm
+ACPIdentityWrapper.mm
 
 Copyright 2020 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,10 @@ NSDictionary *getDictionaryFromJsonString(const char *jsonString);
 
 const char *acp_Identity_ExtensionVersion() {
    return [[ACPIdentity extensionVersion] cStringUsingEncoding:NSUTF8StringEncoding];
+}
+
+void acp_Identity_RegisterExtension() {
+    [ACPIdentity registerExtension];
 }
 
 void acp_AppendToUrl(const char *url, void (*callback)(const char *url)) {
