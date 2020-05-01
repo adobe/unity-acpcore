@@ -1,4 +1,4 @@
-# Adobe Experience Platform - Core plugin for Cordova apps
+# Adobe Experience Platform - Core plugin for unity apps
 
 [![CI](https://github.com/adobe/cordova-acpcore/workflows/CI/badge.svg)](https://github.com/adobe/cordova-acpcore/actions)
 [![npm](https://img.shields.io/npm/v/@adobe/cordova-acpcore)](https://www.npmjs.com/package/@adobe/cordova-acpcore)
