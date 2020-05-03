@@ -28,7 +28,7 @@ Plugins for a Unity project use the following folder structure:
 `{Project}/Assets/Plugins/{Platform}`
 
 ## Installation
-- Download [ACPCore-0.0.1-Unity.zip](https://github.com/adobe/unity-acpcore/tree/master/ACPCore/bin/ACPCore-0.0.1-Unity.zip) 
+- Download [ACPCore-0.0.1-Unity.zip](https://github.com/adobe/unity-acpcore/tree/master/bin/ACPCore-0.0.1-Unity.zip) 
 - Unzip `ACPCore-0.0.1-Unity.zip`
 - Import `ACPCore.unitypackage` via Assets-Import Package
 - 
