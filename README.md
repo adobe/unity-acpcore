@@ -1,8 +1,4 @@
-# Adobe Experience Platform - Core plugin for Cordova apps
-
-[![CI](https://github.com/adobe/cordova-acpcore/workflows/CI/badge.svg)](https://github.com/adobe/cordova-acpcore/actions)
-[![npm](https://img.shields.io/npm/v/@adobe/cordova-acpcore)](https://www.npmjs.com/package/@adobe/cordova-acpcore)
-[![GitHub](https://img.shields.io/github/license/adobe/cordova-acpcore)](https://github.com/adobe/cordova-acpcore/blob/master/LICENSE)
+# Adobe Experience Platform - Core plugin for unity apps
 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
@@ -275,6 +271,28 @@ string signalVersion = ACPSignal.ExtensionVersion();
 
 
 ## Sample App
+Sample App is located in the *unity-acpcore/ACPCore/Assets/Demo*.
+To build demo app for specific platform follow the below instructions.
+
+###### Android
+1. Make sure you have an Android device connected.
+1. From the menu of the `Unity` app, select __File > Build Settings...__
+1. Select `Android` from the __Platform__ window
+1. If `Android` is not the active platform, hit the button that says __Switch Platform__ (it will only be available if you actually need to switch active platforms)
+1. Press the __Build And Run__ button
+1. You will be asked to provide a location to save the build. Make a new directory at *unity-acpcore/ACPCore/Builds* (this folder is in the .gitignore file)
+1. Name build whatever you want and press __Save__
+1. `Unity` will build an `apk` file and automatically deploy it to the connected device
+
+###### iOS
+1. From the menu of the `Unity` app, select __File > Build Settings...__
+1. Select `iOS` from the __Platform__ window
+1. If `iOS` is not the active platform, hit the button that says __Switch Platform__ (it will only be available if you actually need to switch active platforms)
+1. Press the __Build And Run__ button
+1. You will be asked to provide a location to save the build. Make a new directory at *unity-acpcore/ACPCore/Builds* (this folder is in the .gitignore file)
+1. Name build whatever you want and press __Save__
+1. `Unity` will create and open an `Xcode` project
+1. From the Xcode project run the app on a simulator.
 
 ## Contributing
 Looking to contribute to this project? Please review our [Contributing guidelines](.github/CONTRIBUTING.md) prior to opening a pull request.
