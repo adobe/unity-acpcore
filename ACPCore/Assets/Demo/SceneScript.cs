@@ -18,6 +18,7 @@ using AOT;
 
 public class SceneScript : MonoBehaviour
 {
+    public Text txtResult;
     // Core Buttons
     public Button btnCoreExtensionVersion;
     public Button btnSetApplication;
@@ -164,14 +165,16 @@ public class SceneScript : MonoBehaviour
     // Core Methods
     void coreExtensionVersion()
     {
-        string coreVersion = ACPCore.ExtensionVersion();
-        string identityVersion = ACPIdentity.ExtensionVersion();
-        string lifecycleVersion = ACPLifecycle.ExtensionVersion();
-        string signalVersion = ACPSignal.ExtensionVersion();
-        print("coreVersion - " + coreVersion);
-        print("identityVersion - " + identityVersion);
-        print("lifecycleVersion - " + lifecycleVersion);
-        print("signalVersion - " + signalVersion);
+        string coreVersion = "coreVersion - " + ACPCore.ExtensionVersion();
+        string identityVersion = "identityVersion - " + ACPIdentity.ExtensionVersion();
+        string lifecycleVersion = "lifecycleVersion - " + ACPLifecycle.ExtensionVersion();
+        string signalVersion = "signalVersion - " + ACPSignal.ExtensionVersion();
+        print(coreVersion);
+        print(identityVersion);
+        print(lifecycleVersion);
+        print(signalVersion);
+
+        displayResult(coreVersion + identityVersion + lifecycleVersion + signalVersion);
     }
 
     void setApplication()
@@ -321,5 +324,9 @@ public class SceneScript : MonoBehaviour
 
     void urlVariables() {
         ACPIdentity.GetUrlVariables(HandleAdobeGetUrlVariables);
+    }
+
+    void displayResult(string result) {
+        txtResult.text = result;
     }
 }
