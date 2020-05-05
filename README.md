@@ -293,6 +293,7 @@ To build demo app for specific platform follow the below instructions.
 1. Name build whatever you want and press __Save__
 1. `Unity` will create and open an `Xcode` project
 1. From the Xcode project run the app on a simulator.
+1. If you get an error `Symbol not found: _OBJC_CLASS_$_WKWebView`. Select the Unity-iPhone target -> Go to Build Phases tab -> Add `Webkit.Framework` to `Link Binary with Libraries`.
 
 ## Contributing
 Looking to contribute to this project? Please review our [Contributing guidelines](.github/CONTRIBUTING.md) prior to opening a pull request.
