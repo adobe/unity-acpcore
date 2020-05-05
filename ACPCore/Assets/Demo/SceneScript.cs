@@ -47,6 +47,8 @@ public class SceneScript : MonoBehaviour
     public Button btnSyncIdentifiersWithAuthState;
     public Button btnUrlVariables;
 
+    public static string _result = "";
+
     // Core callbacks
     [MonoPInvokeCallback(typeof(AdobeExtensionErrorCallback))]
     public static void HandleAdobeExtensionErrorCallback(string errorName, int errorCode)
@@ -63,7 +65,9 @@ public class SceneScript : MonoBehaviour
     [MonoPInvokeCallback(typeof(AdobePrivacyStatusCallback))]
     public static void HandleAdobePrivacyStatusCallback(int status)
     {
-        print("Privacy status is : " + ((ACPCore.ACPMobilePrivacyStatus)status).ToString());
+        string statusRes = "Privacy status is : " + ((ACPCore.ACPMobilePrivacyStatus)status).ToString();
+        print(statusRes);
+        _result = statusRes;
     }
 
     [MonoPInvokeCallback(typeof(AdobeIdentitiesCallback))]
@@ -72,6 +76,7 @@ public class SceneScript : MonoBehaviour
         if (ids is string)
         {
             print("Ids are : " + ids);
+            _result = "Ids are : " + ids;
         }
     }
 
@@ -86,24 +91,28 @@ public class SceneScript : MonoBehaviour
     public static void HandleAdobeIdentityAppendToUrlCallback(string url)
     {
         print("Url is : " + url);
+        _result = "Url is : " + url;
     }
 
     [MonoPInvokeCallback(typeof(AdobeGetIdentifiersCallback))]
     public static void HandleAdobeGetIdentifiersCallback(string visitorIds)
     {
         print("Ids is : " + visitorIds);
+        _result = "Ids is : " + visitorIds;
     }
 
     [MonoPInvokeCallback(typeof(AdobeGetExperienceCloudIdCallback))]
     public static void HandleAdobeGetExperienceCloudIdCallback(string cloudId)
     {
         print("ECID is : " + cloudId);
+        _result = "ECID is : " + cloudId;
     }
 
     [MonoPInvokeCallback(typeof(AdobeGetUrlVariables))]
     public static void HandleAdobeGetUrlVariables(string urlVariables)
     {
         print("Url variables are : " + urlVariables);
+        _result = "Url variables are : " + urlVariables;
     }
 
     // Start is called before the first frame update
@@ -114,9 +123,9 @@ public class SceneScript : MonoBehaviour
         }
         
         ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.VERBOSE);
-        ACPIdentity.registerExtension();
-        ACPLifecycle.registerExtension();
-        ACPSignal.registerExtension();
+        ACPIdentity.RegisterExtension();
+        ACPLifecycle.RegisterExtension();
+        ACPSignal.RegisterExtension();
         ACPCore.Start(HandleStartAdobeCallback);
 
         // Core
@@ -187,7 +196,6 @@ public class SceneScript : MonoBehaviour
     {
         print("Getting application");
         AndroidJavaObject androidApplication = ACPCore.GetApplication();
-        print("Application : " + androidApplication);
     }
 
     void setLogLevel()
@@ -201,6 +209,7 @@ public class SceneScript : MonoBehaviour
         print("Getting Log Level");
         ACPCore.ACPMobileLogLevel logLevel = ACPCore.GetLogLevel();
         print("Log level : " + logLevel);
+        displayResult("Log level : " + logLevel);
     }
 
     void dispatchEvent()
@@ -245,12 +254,14 @@ public class SceneScript : MonoBehaviour
     {
         print("Calling getSdkIdentities");
         ACPCore.GetSdkIdentities(HandleGetIdentitiesAdobeCallback);
+        displayResult(_result);
     }
 
     void getPrivacyStatus()
     {
         print("Calling getPrivacyStatus");
         ACPCore.GetPrivacyStatus(HandleAdobePrivacyStatusCallback);
+        displayResult(_result);
     }
 
     void downloadRules()
@@ -292,14 +303,17 @@ public class SceneScript : MonoBehaviour
 
     void appendToUrl() {
         ACPIdentity.AppendToUrl("visitorId", HandleAdobeIdentityAppendToUrlCallback);
+        displayResult(_result);
     }
 
     void getIdentifiers() {
         ACPIdentity.GetIdentifiers(HandleAdobeIdentityAppendToUrlCallback);
+        displayResult(_result);
     }
 
     void getExperienceCloudId() {
         ACPIdentity.GetExperienceCloudId(HandleAdobeGetExperienceCloudIdCallback);
+        displayResult(_result);
     }
 
     void syncIdentifier() {
@@ -324,6 +338,7 @@ public class SceneScript : MonoBehaviour
 
     void urlVariables() {
         ACPIdentity.GetUrlVariables(HandleAdobeGetUrlVariables);
+        displayResult(_result);
     }
 
     void displayResult(string result) {

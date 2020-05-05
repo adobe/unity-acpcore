@@ -55,7 +55,7 @@ namespace com.adobe.marketing.mobile
 			#endif
 		}
 
-		public static void registerExtension() {
+		public static void RegisterExtension() {
 			#if UNITY_IPHONE && !UNITY_EDITOR	
             acp_Lifecycle_RegisterExtension();	
 			#elif UNITY_ANDROID && !UNITY_EDITOR 
