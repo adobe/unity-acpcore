@@ -18,7 +18,8 @@ using AOT;
 
 public class SceneScript : MonoBehaviour
 {
-    public Text txtResult;
+    public static Text txtResult;
+    public static Text txtCallbackResult;
     // Core Buttons
     public Button btnCoreExtensionVersion;
     public Button btnSetApplication;
@@ -112,7 +113,8 @@ public class SceneScript : MonoBehaviour
     public static void HandleAdobeGetUrlVariables(string urlVariables)
     {
         print("Url variables are : " + urlVariables);
-        _result = "Url variables are : " + urlVariables;
+        txtCallbackResult.text = "Url variables are : ";
+        //_result = "Url variables are : " + urlVariables;
     }
 
     // Start is called before the first frame update
@@ -155,6 +157,10 @@ public class SceneScript : MonoBehaviour
         btnSyncIdentifiers.onClick.AddListener(syncIdentifiers);
         btnSyncIdentifiersWithAuthState.onClick.AddListener(syncIdentifiersWithAuthState);
         btnUrlVariables.onClick.AddListener(urlVariables);
+
+        // Text
+        var callbackResultsGameObject = GameObject.Find("CallbackResult");
+        txtCallbackResult = callbackResultsGameObject.GetComponent<Text>();
     }
 
     private void OnApplicationPause(bool pauseStatus)
@@ -338,7 +344,7 @@ public class SceneScript : MonoBehaviour
 
     void urlVariables() {
         ACPIdentity.GetUrlVariables(HandleAdobeGetUrlVariables);
-        displayResult(_result);
+        //displayResult(_result);
     }
 
     void displayResult(string result) {
