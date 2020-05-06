@@ -9,61 +9,97 @@ using UnityEngine.SceneManagement;
 namespace Tests
 {
     public class TestSuite
-    {
-        public static string callbackResultText = "";
-    
+    {    
         [UnityTest]
-        public IEnumerator ExtensionVersion()
+        public IEnumerator Test_ExtensionVersion()
         {
-            // Use the Assert class to test conditions.
-            // Use yield to skip a frame
-            AsyncOperation async = SceneManager.LoadSceneAsync("Demo/DemoScene");
-
-            while (!async.isDone)
-            {
-                yield return null;
-            }
-            var extensionVersionButtonGameObject = GameObject.Find("CoreExtensionVersion");
-            var extensionVersionButton = extensionVersionButtonGameObject.GetComponent<Button>();
-            extensionVersionButton.onClick.AddListener(ButtonClickedListener);
-            extensionVersionButton.onClick.Invoke();
-            yield return new WaitForSeconds(0.1f);
             if (Application.platform == RuntimePlatform.Android) {
-                string expectedResult = "coreVersion - 1.5.2 identityVersion - 1.2.0 lifecycleVersion - 1.0.4 signalVersion - 1.0.2 ";
-                Assert.AreEqual(expectedResult, callbackResultText);
-            }            
+                return AssertEqualResult("CoreExtensionVersion", "coreVersion - 1.5.2 identityVersion - 1.2.0 lifecycleVersion - 1.0.4 signalVersion - 1.0.2 "); 
+            } else if (Application.platform == RuntimePlatform.IPhonePlayer) {
+                return AssertEqualResult("CoreExtensionVersion", "coreVersion - 1.5.2 identityVersion - 1.2.0 lifecycleVersion - 1.0.4 signalVersion - 1.0.2 "); 
+            } else {
+                return null;
+            }
         }
 
         [UnityTest]
-        public IEnumerator GetPrivacyStatus()
+        public IEnumerator Test_GetPrivacyStatus()
+        {         
+            return AssertEqualResult("GetPrivacyStatus", "Privacy status is : OPT_IN");      
+        }
+
+        [UnityTest]
+        public IEnumerator Test_GetLogLevel()
         {
-            // Use the Assert class to test conditions.
-            // Use yield to skip a frame
+            return AssertEqualResult("GetLogLevel", "Log level : VERBOSE");          
+        }
+
+        [UnityTest]
+        public IEnumerator Test_GetSdkIdentities()
+        {
+            return AssertGreaterLengthResult("GetSdkIdentities", "Ids are : ".Length);
+        }
+
+        [UnityTest]
+        public IEnumerator Test_AppendToUrl()
+        {
+            return AssertGreaterLengthResult("AppendToUrl", "Url is : ".Length);
+        }
+
+        [UnityTest]
+        public IEnumerator Test_GetIdentifiers()
+        {
+            InvokeButtonClick("AppendToUrl");
+            return AssertGreaterLengthResult("GetIdentifiers", "Ids is : ".Length);
+        }
+
+        [UnityTest]
+        public IEnumerator Test_GetExperienceCloudId()
+        {
+            return AssertGreaterLengthResult("GetExperienceCloudId", "ECID is : ".Length);
+        }
+
+        [UnityTest]
+        public IEnumerator Test_UrlVariables()
+        {
+            return AssertGreaterLengthResult("UrlVariables", "Url variables are : ".Length);
+        }
+        
+        // Helper functions
+        private IEnumerator CommonCode() {
             AsyncOperation async = SceneManager.LoadSceneAsync("Demo/DemoScene");
 
             while (!async.isDone)
             {
                 yield return null;
             }
-            var privacyStatus = GameObject.Find("GetPrivacyStatus");
-            var privacyStatusButton = privacyStatus.GetComponent<Button>();
-            privacyStatusButton.onClick.Invoke();
+        }
+
+        private void InvokeButtonClick(string gameObjName) {
+            var gameObj = GameObject.Find(gameObjName);
+            var button = gameObj.GetComponent<Button>();
+            button.onClick.Invoke();
+        }
+
+        private string GetActualResult()
+        {
+            var callbackResultsGameObject = GameObject.Find("Result");
+            var callbackResults = callbackResultsGameObject.GetComponent<Text>();
+            return callbackResults.text;
+        }
+
+        private IEnumerator AssertEqualResult(string gameObjectName, string expectedResult) {
+            yield return CommonCode();
+            InvokeButtonClick(gameObjectName);
             yield return new WaitForSeconds(1f);
-            var callbackResultsGameObject = GameObject.Find("Result");
-            var callbackResults = callbackResultsGameObject.GetComponent<Text>();
-            string actualResult = callbackResults.text;
-            if (Application.platform == RuntimePlatform.Android) {
-                string expectedResult = "Privacy status is : OPT_IN";
-                Assert.AreEqual(expectedResult, actualResult);
-            }            
+            Assert.AreEqual(expectedResult, GetActualResult());
         }
 
-        // Helper function for button click
-        private void ButtonClickedListener()
-        {
-            var callbackResultsGameObject = GameObject.Find("Result");
-            var callbackResults = callbackResultsGameObject.GetComponent<Text>();
-            callbackResultText = callbackResults.text;
+        private IEnumerator AssertGreaterLengthResult(string gameObjectName, int expectedLength) {
+            yield return CommonCode();
+            InvokeButtonClick(gameObjectName);
+            yield return new WaitForSeconds(1f);
+            Assert.Greater(GetActualResult().Length, expectedLength);
         }
     }
 }

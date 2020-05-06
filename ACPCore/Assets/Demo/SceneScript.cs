@@ -112,8 +112,6 @@ public class SceneScript : MonoBehaviour
     public static void HandleAdobeGetUrlVariables(string urlVariables)
     {
         print("Url variables are : " + urlVariables);
-        //txtCallbackResult.text = "Url variables are : ";
-        //UnityMainThreadDispatcher.Instance().Enqueue(ThisWillBeExecutedOnTheMainThread());
         _result = "Url variables are : " + urlVariables;
     }
 
@@ -308,7 +306,7 @@ public class SceneScript : MonoBehaviour
     }
 
     void getIdentifiers() {
-        ACPIdentity.GetIdentifiers(HandleAdobeIdentityAppendToUrlCallback);
+        ACPIdentity.GetIdentifiers(HandleAdobeGetIdentifiersCallback);
     }
 
     void getExperienceCloudId() {
