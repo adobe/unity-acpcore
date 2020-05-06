@@ -18,8 +18,7 @@ using AOT;
 
 public class SceneScript : MonoBehaviour
 {
-    public static Text txtResult;
-    public static Text txtCallbackResult;
+    public Text txtResult;
     // Core Buttons
     public Button btnCoreExtensionVersion;
     public Button btnSetApplication;
@@ -113,8 +112,13 @@ public class SceneScript : MonoBehaviour
     public static void HandleAdobeGetUrlVariables(string urlVariables)
     {
         print("Url variables are : " + urlVariables);
-        txtCallbackResult.text = "Url variables are : ";
-        //_result = "Url variables are : " + urlVariables;
+        //txtCallbackResult.text = "Url variables are : ";
+        //UnityMainThreadDispatcher.Instance().Enqueue(ThisWillBeExecutedOnTheMainThread());
+        _result = "Url variables are : " + urlVariables;
+    }
+
+    private void Update() {
+        txtResult.text = _result;
     }
 
     // Start is called before the first frame update
@@ -157,10 +161,6 @@ public class SceneScript : MonoBehaviour
         btnSyncIdentifiers.onClick.AddListener(syncIdentifiers);
         btnSyncIdentifiersWithAuthState.onClick.AddListener(syncIdentifiersWithAuthState);
         btnUrlVariables.onClick.AddListener(urlVariables);
-
-        // Text
-        var callbackResultsGameObject = GameObject.Find("CallbackResult");
-        txtCallbackResult = callbackResultsGameObject.GetComponent<Text>();
     }
 
     private void OnApplicationPause(bool pauseStatus)
@@ -189,7 +189,9 @@ public class SceneScript : MonoBehaviour
         print(lifecycleVersion);
         print(signalVersion);
 
-        displayResult(coreVersion + identityVersion + lifecycleVersion + signalVersion);
+        //displayResult(coreVersion + identityVersion + lifecycleVersion + signalVersion);
+        _result = coreVersion;
+        txtResult.text = _result;
     }
 
     void setApplication()
@@ -215,7 +217,7 @@ public class SceneScript : MonoBehaviour
         print("Getting Log Level");
         ACPCore.ACPMobileLogLevel logLevel = ACPCore.GetLogLevel();
         print("Log level : " + logLevel);
-        displayResult("Log level : " + logLevel);
+        _result = "Log level : " + logLevel;
     }
 
     void dispatchEvent()
@@ -260,14 +262,12 @@ public class SceneScript : MonoBehaviour
     {
         print("Calling getSdkIdentities");
         ACPCore.GetSdkIdentities(HandleGetIdentitiesAdobeCallback);
-        displayResult(_result);
     }
 
     void getPrivacyStatus()
     {
         print("Calling getPrivacyStatus");
         ACPCore.GetPrivacyStatus(HandleAdobePrivacyStatusCallback);
-        displayResult(_result);
     }
 
     void downloadRules()
@@ -309,17 +309,14 @@ public class SceneScript : MonoBehaviour
 
     void appendToUrl() {
         ACPIdentity.AppendToUrl("visitorId", HandleAdobeIdentityAppendToUrlCallback);
-        displayResult(_result);
     }
 
     void getIdentifiers() {
         ACPIdentity.GetIdentifiers(HandleAdobeIdentityAppendToUrlCallback);
-        displayResult(_result);
     }
 
     void getExperienceCloudId() {
         ACPIdentity.GetExperienceCloudId(HandleAdobeGetExperienceCloudIdCallback);
-        displayResult(_result);
     }
 
     void syncIdentifier() {
@@ -344,10 +341,5 @@ public class SceneScript : MonoBehaviour
 
     void urlVariables() {
         ACPIdentity.GetUrlVariables(HandleAdobeGetUrlVariables);
-        //displayResult(_result);
-    }
-
-    void displayResult(string result) {
-        txtResult.text = result;
     }
 }

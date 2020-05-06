@@ -274,6 +274,7 @@ namespace com.adobe.marketing.mobile
 				return;
 			}
 			#if UNITY_ANDROID && !UNITY_EDITOR
+			AndroidJNI.AttachCurrentThread ();
 			identity.CallStatic("getUrlVariables", new GetUrlVariables(callback));
 			#elif UNITY_IPHONE && !UNITY_EDITOR	
 			acp_GetUrlVariables(callback);

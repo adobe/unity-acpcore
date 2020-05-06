@@ -10,7 +10,6 @@ namespace Tests
 {
     public class TestSuite
     {
-
         public static string extensionVersion = "";
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
         // `yield return null;` to skip a frame.
@@ -25,18 +24,19 @@ namespace Tests
             {
                 yield return null;
             }
-            var extensionVersionButtonGameObject = GameObject.Find("ExtensionVersion");
+            var extensionVersionButtonGameObject = GameObject.Find("CoreExtensionVersion");
             var extensionVersionButton = extensionVersionButtonGameObject.GetComponent<Button>();
             extensionVersionButton.onClick.AddListener(extensionVersionButtonClicked);
             extensionVersionButton.onClick.Invoke();
+            yield return new WaitForSeconds(0.1f);
             if (Application.platform == RuntimePlatform.Android) {
-                Assert.AreEqual("1.2.4",extensionVersion);
-            }
+                Assert.AreEqual("coreVersion - 1.5.2", extensionVersion);
+            }            
         }
 
         private void extensionVersionButtonClicked()
         {
-            var callbackResultsGameObject = GameObject.Find("CallbackResults");
+            var callbackResultsGameObject = GameObject.Find("CallbackResult");
             var callbackResults = callbackResultsGameObject.GetComponent<Text>();
             extensionVersion = callbackResults.text;
         }
