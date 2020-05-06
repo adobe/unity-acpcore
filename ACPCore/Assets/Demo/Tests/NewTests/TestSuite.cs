@@ -10,11 +10,10 @@ namespace Tests
 {
     public class TestSuite
     {
-        public static string extensionVersion = "";
-        // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-        // `yield return null;` to skip a frame.
+        public static string callbackResultText = "";
+    
         [UnityTest]
-        public IEnumerator CoreExtensionVersion()
+        public IEnumerator ExtensionVersion()
         {
             // Use the Assert class to test conditions.
             // Use yield to skip a frame
@@ -26,19 +25,45 @@ namespace Tests
             }
             var extensionVersionButtonGameObject = GameObject.Find("CoreExtensionVersion");
             var extensionVersionButton = extensionVersionButtonGameObject.GetComponent<Button>();
-            extensionVersionButton.onClick.AddListener(extensionVersionButtonClicked);
+            extensionVersionButton.onClick.AddListener(ButtonClickedListener);
             extensionVersionButton.onClick.Invoke();
             yield return new WaitForSeconds(0.1f);
             if (Application.platform == RuntimePlatform.Android) {
-                Assert.AreEqual("coreVersion - 1.5.2", extensionVersion);
+                string expectedResult = "coreVersion - 1.5.2 identityVersion - 1.2.0 lifecycleVersion - 1.0.4 signalVersion - 1.0.2 ";
+                Assert.AreEqual(expectedResult, callbackResultText);
             }            
         }
 
-        private void extensionVersionButtonClicked()
+        [UnityTest]
+        public IEnumerator GetPrivacyStatus()
         {
-            var callbackResultsGameObject = GameObject.Find("CallbackResult");
+            // Use the Assert class to test conditions.
+            // Use yield to skip a frame
+            AsyncOperation async = SceneManager.LoadSceneAsync("Demo/DemoScene");
+
+            while (!async.isDone)
+            {
+                yield return null;
+            }
+            var privacyStatus = GameObject.Find("GetPrivacyStatus");
+            var privacyStatusButton = privacyStatus.GetComponent<Button>();
+            privacyStatusButton.onClick.Invoke();
+            yield return new WaitForSeconds(1f);
+            var callbackResultsGameObject = GameObject.Find("Result");
             var callbackResults = callbackResultsGameObject.GetComponent<Text>();
-            extensionVersion = callbackResults.text;
+            string actualResult = callbackResults.text;
+            if (Application.platform == RuntimePlatform.Android) {
+                string expectedResult = "Privacy status is : OPT_IN";
+                Assert.AreEqual(expectedResult, actualResult);
+            }            
+        }
+
+        // Helper function for button click
+        private void ButtonClickedListener()
+        {
+            var callbackResultsGameObject = GameObject.Find("Result");
+            var callbackResults = callbackResultsGameObject.GetComponent<Text>();
+            callbackResultText = callbackResults.text;
         }
     }
 }

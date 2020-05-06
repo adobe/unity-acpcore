@@ -180,17 +180,13 @@ public class SceneScript : MonoBehaviour
     // Core Methods
     void coreExtensionVersion()
     {
-        string coreVersion = "coreVersion - " + ACPCore.ExtensionVersion();
-        string identityVersion = "identityVersion - " + ACPIdentity.ExtensionVersion();
-        string lifecycleVersion = "lifecycleVersion - " + ACPLifecycle.ExtensionVersion();
-        string signalVersion = "signalVersion - " + ACPSignal.ExtensionVersion();
-        print(coreVersion);
-        print(identityVersion);
-        print(lifecycleVersion);
-        print(signalVersion);
+        string coreVersion = "coreVersion - " + ACPCore.ExtensionVersion() + " ";
+        string identityVersion = "identityVersion - " + ACPIdentity.ExtensionVersion() + " ";
+        string lifecycleVersion = "lifecycleVersion - " + ACPLifecycle.ExtensionVersion() + " ";
+        string signalVersion = "signalVersion - " + ACPSignal.ExtensionVersion() + " ";
 
-        //displayResult(coreVersion + identityVersion + lifecycleVersion + signalVersion);
-        _result = coreVersion;
+        _result = coreVersion + identityVersion + lifecycleVersion + signalVersion;
+        print(_result);
         txtResult.text = _result;
     }
 
