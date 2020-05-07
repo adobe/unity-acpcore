@@ -77,10 +77,6 @@ namespace Tests
             }
         }
 
-        private IEnumerator UnLoadScene() {
-            yield return SceneManager.UnloadSceneAsync("Demo/DemoScene");
-        }
-
         private void InvokeButtonClick(string gameObjName) {
             var gameObj = GameObject.Find(gameObjName);
             var button = gameObj.GetComponent<Button>();
@@ -99,7 +95,6 @@ namespace Tests
             InvokeButtonClick(gameObjectName);
             yield return new WaitForSeconds(1f);
             Assert.AreEqual(expectedResult, GetActualResult());
-            UnLoadScene();
         }
 
         private IEnumerator AssertGreaterLengthResult(string gameObjectName, int expectedLength) {
@@ -107,7 +102,6 @@ namespace Tests
             InvokeButtonClick(gameObjectName);
             yield return new WaitForSeconds(1f);
             Assert.Greater(GetActualResult().Length, expectedLength);
-            UnLoadScene();
         }
     }
 }
