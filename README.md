@@ -268,7 +268,11 @@ string signalVersion = ACPSignal.ExtensionVersion();
 ```
 
 ## Running Tests
-
+1. Open the demo app in unity.
+2. Open the test runner from `Window -> General -> TestRunner`.
+3. Click on the `PlayMode` tab.
+4. Connect an Android device. As we run the tests on a device in play mode.
+5. Click `Run all in player (Android)` to run the tests.
 
 ## Sample App
 Sample App is located in the *unity-acpcore/ACPCore/Assets/Demo*.
