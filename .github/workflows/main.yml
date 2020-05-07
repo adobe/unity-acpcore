@@ -1,0 +1,23 @@
+name: Build ACPCore
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master, Githubactions ]
+
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        unity-version: [2019.2.13f1]
+    steps:
+      - run: echo -n -e "HELLO\n !\n World!"
+
+      - uses: pCYSl5EDgo/setup-unity@master
+        with:
+          unity-version: ${{ matrix.unity-version }}
+
+      - run: /opt/Unity/Editor/Unity -quit -batchMode -logFile -noGraphics -createManualActivationFile -projectPath ./ACPCore -exportPackage ./ACPCore/Assets/Plugins ./bin/build_temp/ACPCore.unitypackage || exit 0
+      - run: cat Unity_v${{ matrix.unity-version }}.alf
