@@ -24,13 +24,15 @@ namespace Tests
 
         [UnityTest]
         public IEnumerator Test_GetPrivacyStatus()
-        {         
+        {
+            InvokeButtonClick("SetPrivacyStatus");
             return AssertEqualResult("GetPrivacyStatus", "Privacy status is : OPT_IN");      
         }
 
         [UnityTest]
         public IEnumerator Test_GetLogLevel()
         {
+            InvokeButtonClick("SetLogLevel");
             return AssertEqualResult("GetLogLevel", "Log level : VERBOSE");          
         }
 
@@ -66,13 +68,17 @@ namespace Tests
         }
         
         // Helper functions
-        private IEnumerator CommonCode() {
+        private IEnumerator LoadScene() {
             AsyncOperation async = SceneManager.LoadSceneAsync("Demo/DemoScene");
 
             while (!async.isDone)
             {
                 yield return null;
             }
+        }
+
+        private IEnumerator UnLoadScene() {
+            yield return SceneManager.UnloadSceneAsync("Demo/DemoScene");
         }
 
         private void InvokeButtonClick(string gameObjName) {
@@ -89,17 +95,19 @@ namespace Tests
         }
 
         private IEnumerator AssertEqualResult(string gameObjectName, string expectedResult) {
-            yield return CommonCode();
+            yield return LoadScene();
             InvokeButtonClick(gameObjectName);
             yield return new WaitForSeconds(1f);
             Assert.AreEqual(expectedResult, GetActualResult());
+            UnLoadScene();
         }
 
         private IEnumerator AssertGreaterLengthResult(string gameObjectName, int expectedLength) {
-            yield return CommonCode();
+            yield return LoadScene();
             InvokeButtonClick(gameObjectName);
             yield return new WaitForSeconds(1f);
             Assert.Greater(GetActualResult().Length, expectedLength);
+            UnLoadScene();
         }
     }
 }
