@@ -23,6 +23,10 @@ const char *acp_ExtensionVersion() {
     return [[ACPCore extensionVersion] cStringUsingEncoding:NSUTF8StringEncoding];
 }
 
+void acp_SetWrapperType() {
+    [ACPCore setWrapperType:ACPMobileWrapperTypeUnity];
+}
+
 void acp_SetLogLevel(int logLevel) {
     [ACPCore setLogLevel:ACPMobileLogLevel(logLevel)];
 }

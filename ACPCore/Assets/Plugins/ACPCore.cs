@@ -153,6 +153,9 @@ namespace com.adobe.marketing.mobile
 		 * =================================================================== */
 		[DllImport ("__Internal")]
 		private static extern System.IntPtr acp_ExtensionVersion();
+
+		[DllImport ("__Internal")]
+		private static extern void acp_SetWrapperType();
 		
 		[DllImport ("__Internal")]
 		private static extern void acp_SetLogLevel(int logLevel);
@@ -259,7 +262,6 @@ namespace com.adobe.marketing.mobile
 			#endif
 		}
 
-
 		public static AndroidJavaObject GetApplication() 
 		{
 			#if UNITY_ANDROID && !UNITY_EDITOR			
@@ -267,6 +269,18 @@ namespace com.adobe.marketing.mobile
 			#endif
 
 			return null;
+		}
+
+		public static void SetWrapperType() {
+			#if UNITY_ANDROID && !UNITY_EDITOR
+			using (var wrapperType = new AndroidJavaClass("com.adobe.marketing.mobile.WrapperType")) 
+			{
+				var wrapperTypeObj = wrapperType.GetStatic<AndroidJavaObject>("UNITY");
+				mobileCore.CallStatic("setWrapperType", wrapperTypeObj);
+			} 
+			#elif UNITY_IPHONE && !UNITY_EDITOR
+			acp_SetWrapperType();
+			#endif
 		}
 
 		public static void SetLogLevel(ACPMobileLogLevel logLevel) {

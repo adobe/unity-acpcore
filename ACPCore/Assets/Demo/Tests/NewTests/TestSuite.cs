@@ -14,7 +14,7 @@ namespace Tests
         public IEnumerator Test_ExtensionVersion()
         {
             if (Application.platform == RuntimePlatform.Android) {
-                return AssertEqualResult("CoreExtensionVersion", "coreVersion - 1.5.2 identityVersion - 1.2.0 lifecycleVersion - 1.0.4 signalVersion - 1.0.2 "); 
+                return AssertEqualResult("CoreExtensionVersion", "coreVersion - 1.5.3 identityVersion - 1.2.0 lifecycleVersion - 1.0.4 signalVersion - 1.0.2 "); 
             } else if (Application.platform == RuntimePlatform.IPhonePlayer) {
                 return AssertEqualResult("CoreExtensionVersion", "coreVersion - 1.5.2 identityVersion - 1.2.0 lifecycleVersion - 1.0.4 signalVersion - 1.0.2 "); 
             } else {
