@@ -41,7 +41,7 @@ jobs:
           package-path: 'tmp_folder/ACPCore.unitypackage'
           include-files: metaList
           project-folder: .
-      - name: create-unitypackage
+      - name: uploading package
         uses: actions/upload-artifact@master
         with:
           path: tmp_folder/ACPCore.unitypackage
