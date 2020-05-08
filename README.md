@@ -48,6 +48,7 @@ public class MainScript : MonoBehaviour
         }
         
         ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.VERBOSE);
+        ACPCore.SetWrapperType();
         ACPIdentity.registerExtension();
         ACPLifecycle.registerExtension();
         ACPSignal.registerExtension();
