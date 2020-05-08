@@ -38,6 +38,11 @@ jobs:
         uses: pCYSl5EDgo/create-unitypackage@v1
         with:
           # Output unitypackage file path
-          package-path: './bin/build_temp/ACPCore.unitypackage'
+          package-path: 'tmp_folderp/ACPCore.unitypackage'
           include-files: metaList
           project-folder: .
+      - name: create-unitypackage
+        uses: actions/upload-artifact@master
+        with:
+          path: tmp_folder
+          name: package
