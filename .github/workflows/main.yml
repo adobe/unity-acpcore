@@ -1,23 +1,41 @@
+# This is a basic workflow to help you get started with Actions
+
 name: Build ACPCore
 
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
 on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master, Githubactions ]
+    branches: [ master ]
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  echo:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        unity-version: [2019.2.13f1]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - run: echo -n -e "HELLO\n !\n World!"
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
 
-      - uses: pCYSl5EDgo/setup-unity@master
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      - run: |
+          echo "Assets/Plugins.meta" > metaList
+          find ./Assets/Plugins/ -name \*.meta >> metaList
+          find ./Assets/Plugins/Android/ -name \*.meta >> metaList
+          find ./Assets/Plugins/iOS/ -name \*.meta >> metaList
+
+      - name: create-unitypackage
+        uses: pCYSl5EDgo/create-unitypackage@v1
         with:
-          unity-version: ${{ matrix.unity-version }}
-
-      - run: /opt/Unity/Editor/Unity -quit -batchMode -logFile -noGraphics -createManualActivationFile -projectPath ./ACPCore -exportPackage ./ACPCore/Assets/Plugins ./bin/build_temp/ACPCore.unitypackage || exit 0
-      - run: cat Unity_v${{ matrix.unity-version }}.alf
+          # Output unitypackage file path
+          package-path: ./bin/build_temp/ACPCore.unitypackage
+          include-files: metaList
+          project-folder: ./ACPCore
