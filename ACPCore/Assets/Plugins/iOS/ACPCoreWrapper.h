@@ -16,6 +16,7 @@ governing permissions and limitations under the License.
 
 extern "C" {
     const char *acp_ExtensionVersion();
+    void acp_SetWrapperType();
     void acp_SetLogLevel(int logLevel);
     int acp_GetLogLevel();
     void acp_Start(void (*callback)());

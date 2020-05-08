@@ -127,6 +127,7 @@ public class SceneScript : MonoBehaviour
         }
         
         ACPCore.SetLogLevel(ACPCore.ACPMobileLogLevel.VERBOSE);
+        ACPCore.SetWrapperType();
         ACPIdentity.RegisterExtension();
         ACPLifecycle.RegisterExtension();
         ACPSignal.RegisterExtension();
