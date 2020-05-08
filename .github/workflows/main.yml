@@ -44,5 +44,5 @@ jobs:
       - name: create-unitypackage
         uses: actions/upload-artifact@master
         with:
-          path: tmp_folder
-          name: package
+          path: tmp_folder/ACPCore.unitypackage
+          name: ACPCorePackage
