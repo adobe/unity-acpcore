@@ -170,9 +170,9 @@ ACPCore.SetAdvertisingIdentifier("AdId");
 
 ##### Calling track action
 ```cs
-var dict = new Dictionary<string, string>();
-dict.Add("key", "value");
-ACPCore.TrackAction("action", dict);
+var contextData = new Dictionary<string, string>();
+contextData.Add("key", "value");
+ACPCore.TrackAction("action", contextData);
 ```
 
 ##### Calling track state
@@ -235,12 +235,13 @@ ACPIdentity.GetUrlVariables(HandleAdobeGetUrlVariables);
 
 ##### Get Identifiers:
 ```cs
-[MonoPInvokeCallback(typeof(AdobeIdentityAppendToUrlCallback))]
-public static void HandleAdobeIdentityAppendToUrlCallback(string url)
+[MonoPInvokeCallback(typeof(AdobeGetIdentifiersCallback))]
+public static void HandleAdobeGetIdentifiersCallback(string visitorIds)
 {
-    print("Url is : " + url);
+    print("Ids is : " + visitorIds);
+    _result = "Ids is : " + visitorIds;
 }
-ACPIdentity.GetIdentifiers(HandleAdobeIdentityAppendToUrlCallback);
+ACPIdentity.GetIdentifiers(HandleAdobeGetIdentifiersCallback);
 ```
 
 ##### Get Experience Cloud IDs:
@@ -254,7 +255,23 @@ ACPIdentity.GetExperienceCloudId(HandleAdobeGetExperienceCloudIdCallback);
 ```
 
 ### [Lifecycle](https://aep-sdks.gitbook.io/docs/using-mobile-extensions/mobile-core/lifecycle)
-> Note: We recommend implementing Lifecycle in native [Android and iOS code](https://aep-sdks.gitbook.io/docs/using-mobile-extensions/mobile-core/lifecycle).
+##### Starting and pausing a lifecycle event
+
+```csharp
+private void OnApplicationPause(bool pauseStatus)
+{
+  if (pauseStatus)
+  {
+    ACPCore.LifecyclePause();
+  }
+  else
+  {
+    var cdata = new Dictionary<string, string>();
+    cdata.Add("launch.data", "added");
+    ACPCore.LifecycleStart(cdata);
+  }
+}
+```
 
 ##### Getting Lifecycle version:
 ```cs
