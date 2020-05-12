@@ -2,7 +2,7 @@ name: ACPCore CI/CD
 
 on:
   push:
-    branches: [ master, LicenseAndGithubActions ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
