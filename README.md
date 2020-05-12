@@ -235,12 +235,13 @@ ACPIdentity.GetUrlVariables(HandleAdobeGetUrlVariables);
 
 ##### Get Identifiers:
 ```cs
-[MonoPInvokeCallback(typeof(AdobeIdentityAppendToUrlCallback))]
-public static void HandleAdobeIdentityAppendToUrlCallback(string url)
+[MonoPInvokeCallback(typeof(AdobeGetIdentifiersCallback))]
+public static void HandleAdobeGetIdentifiersCallback(string visitorIds)
 {
-    print("Url is : " + url);
+    print("Ids is : " + visitorIds);
+    _result = "Ids is : " + visitorIds;
 }
-ACPIdentity.GetIdentifiers(HandleAdobeIdentityAppendToUrlCallback);
+ACPIdentity.GetIdentifiers(HandleAdobeGetIdentifiersCallback);
 ```
 
 ##### Get Experience Cloud IDs:
