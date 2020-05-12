@@ -2,7 +2,7 @@ name: ACPCore CI/CD
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, LicenseAndGithubActions ]
   pull_request:
     branches: [ master ]
 
@@ -11,7 +11,7 @@ env:
 
 jobs:
   build:
-    name: Build ACPAnalytics
+    name: Build ACPCore
     runs-on: ubuntu-latest
 
     steps:
