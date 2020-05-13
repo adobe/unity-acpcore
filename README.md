@@ -36,7 +36,7 @@ Plugins for a Unity project use the following folder structure:
 ##### Initialize by registering the extensions and calling the start function fo core
 ```
 using com.adobe.marketing.mobile;
-using using AOT;
+using AOT;
 
 public class MainScript : MonoBehaviour
 {
