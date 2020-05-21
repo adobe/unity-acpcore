@@ -232,6 +232,7 @@ namespace com.adobe.marketing.mobile
 		* Static Helper objects for our JNI access
 		* =================================================================== */
 		static AndroidJavaClass mobileCore = new AndroidJavaClass("com.adobe.marketing.mobile.MobileCore");
+		static AndroidJavaClass aepCoreBridge = new AndroidJavaClass("com.adobe.marketing.mobile.AEPCoreBridge");
 		#endif
 
 		/*---------------------------------------------------------------------
@@ -258,6 +259,8 @@ namespace com.adobe.marketing.mobile
 				// get application
 				var application = activity.Call<AndroidJavaObject>("getApplication");
 				mobileCore.CallStatic("setApplication", application);
+				// Set the activity in core using the bridge
+				aepCoreBridge.CallStatic("setCurrentActivity", activity);
 			}
 			#endif
 		}
