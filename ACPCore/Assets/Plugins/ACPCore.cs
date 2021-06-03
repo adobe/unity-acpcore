@@ -1,5 +1,5 @@
 ﻿/*
-Unity Plug-in v: 0.0.1
+Unity Plug-in v: 1.0.0
 ACPCore.cs
 
 Copyright 2020 Adobe. All rights reserved.
