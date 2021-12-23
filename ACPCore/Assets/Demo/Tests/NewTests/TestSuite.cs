@@ -30,7 +30,7 @@ namespace Tests
             if (Application.platform == RuntimePlatform.Android) {
                 return AssertEqualResult("CoreExtensionVersion", "coreVersion - 1.5.3-UN identityVersion - 1.2.0 lifecycleVersion - 1.0.4 signalVersion - 1.0.2 "); 
             } else if (Application.platform == RuntimePlatform.IPhonePlayer) {
-                return AssertEqualResult("CoreExtensionVersion", "coreVersion - 2.6.0- identityVersion - 2.2.1 lifecycleVersion - 2.0.4 signalVersion - 2.0.4 "); 
+                return AssertEqualResult("CoreExtensionVersion", "coreVersion - 2.9.4-U identityVersion - 2.5.1 lifecycleVersion - 2.2.1 signalVersion - 2.2.0 "); 
             } else {
                 return null;
             }
