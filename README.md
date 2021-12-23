@@ -330,7 +330,7 @@ To build demo app for specific platform follow the below instructions.
 5. You will be asked to provide a location to save the build. Make a new directory at *unity-acpcore/ACPCore/Builds* (this folder is in the .gitignore file)
 6. Name build whatever you want and press __Save__
 7. `Unity` will create and open an `Xcode` project
-8. [Add XCFrameworks to the Xcode project](#iOS-installation).
+8. [Add XCFrameworks to the Xcode project](#ios-installation).
 9. From the Xcode project run the app on a simulator.
 
 ## Additional Unity Plugins
