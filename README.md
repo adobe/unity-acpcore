@@ -339,8 +339,8 @@ Below is a list of additional Unity plugins from the ACP SDK suite:
 
 | Extension | GitHub | Unity Package |
 |-----------|--------|-----|
-| Adobe Analytics | https://github.com/adobe/unity-acpanalytics | [ACPAnalytics](https://github.com/adobe/unity-acpanalytics/raw/master/bin/ACPAnalytics-0.0.1-Unity.zip)
-| Project Griffon (Beta) | https://github.com/adobe/unity-acpgriffon | [ACPGriffon](https://github.com/adobe/unity-acpgriffon/raw/master/bin/ACPGriffon-0.0.1-Unity.zip)
+| ACPAnalytics | https://github.com/adobe/unity-acpanalytics | [ACPAnalytics](https://github.com/adobe/unity-acpanalytics/blob/master/bin/ACPAnalytics-1.0.0-Unity.zip)
+| AEPAssurance | https://github.com/adobe/unity-acpgriffon | [AEPAssurance](https://github.com/adobe/unity-aepassurance/blob/master/bin/AEPAssurance-1.0.0-Unity.zip)
 
 ## Contributing
 Looking to contribute to this project? Please review our [Contributing guidelines](.github/CONTRIBUTING.md) prior to opening a pull request.
