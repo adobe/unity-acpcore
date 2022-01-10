@@ -23,10 +23,13 @@ Plugins for a Unity project use the following folder structure:
 
 `{Project}/Assets/Plugins/{Platform}`
 
+## Building the ACPCore Unity Package
+1. Clone the current repository.
+2. In the root directory, run the following command to build the ACPCore Unity package in bin -> build_temp -> ACPCore-1.0.0-Unity -> ACPCore folder:
+    `make release`
+3. Import `ACPCore.unitypackage` via Assets-Import Package.
+
 ## Installation
-- Download [ACPCore-1.0.0-Unity.zip](./bin/ACPCore-1.0.0-Unity.zip) 
-- Unzip `ACPCore-1.0.0-Unity.zip`
-- Import `ACPCore.unitypackage` via Assets-Import Package
 
 #### Android installation
 No additional steps are required for Android installation.
