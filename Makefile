@@ -1,8 +1,8 @@
 VERSION=$(shell grep 'Plug-in v:' ACPCore/Assets/Plugins/ACPCore.cs | sed 's/.*Plug-in v.*:[[:space:]]*\(.*\)[[:space:]]*/\1/')
 RELEASE_DIR=ACPCore-$(VERSION)-Unity
 MOBILE_DIR=$(RELEASE_DIR)/ACPCore
-# UNITY_BIN=/Applications/Unity/Hub/Editor/2019.3.10f1/Unity.app/Contents/MacOS/Unity
-UNITY_BIN=/Applications/Unity/Unity.app/Contents/MacOS/Unity
+UNITY_BIN=/Applications/Unity/Hub/Editor/2019.4.34f1/Unity.app/Contents/MacOS/Unity
+# UNITY_BIN=/Applications/Unity/Unity.app/Contents/MacOS/Unity
 ROOT_DIR=.
 CURRENT_PATH=$(shell pwd)
 PROJECT_DIR=$(CURRENT_PATH)/ACPCore

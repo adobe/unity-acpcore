@@ -25,17 +25,16 @@ Plugins for a Unity project use the following folder structure:
 
 ## Installation
 
-#### Building the ACPCore Unity Package
-1. Clone the current repository.
-2. In the root directory, run the following command to build the ACPCore Unity package:
-    `make release`
-3. In the Unity project, import `ACPCore.unitypackage` via Assets-Import Package from `bin -> build_temp -> ACPCore-1.0.0-Unity -> ACPCore` folder.
+#### Installing the ACPCore Unity Package
+- Download [ACPCore-1.0.1-Unity.zip](./bin/ACPCore-1.0.1-Unity.zip) 
+- Unzip `ACPCore-1.0.1-Unity.zip`
+- Import `ACPCore.unitypackage` via Assets-Import Package
 
 #### Android installation
 No additional steps are required for Android installation.
 
 #### iOS installation
-ACPCore 1.0.0 and above is shipped with XCFrameworks. Follow these steps to add them to the Xcode project generated when building and running for iOS platform in Unity.
+ACPCore 1.0.1 and above is shipped with XCFrameworks. Follow these steps to add them to the Xcode project generated when building and running for iOS platform in Unity.
 1. Go to File -> Project Settings -> Build System and select `New Build System`.
 2. [Download](https://github.com/Adobe-Marketing-Cloud/acp-sdks/tree/master/iOS/ACPCore) `ACPCore.xcframework`, `ACPIdentity.xcframework`, `ACPLifecycle.xcframework` and `ACPSignal.xcframework`.
 3. Select the UnityFramework target -> Go to Build Phases tab -> Add the XCFrameworks downloaded in Step 2 to `Link Binary with Libraries`.
@@ -344,6 +343,7 @@ Below is a list of additional Unity plugins from the ACP SDK suite:
 |-----------|--------|-----|
 | ACPAnalytics | https://github.com/adobe/unity-acpanalytics | [ACPAnalytics](https://github.com/adobe/unity-acpanalytics/blob/master/bin/ACPAnalytics-1.0.0-Unity.zip)
 | AEPAssurance | https://github.com/adobe/unity-acpgriffon | [AEPAssurance](https://github.com/adobe/unity-aepassurance/blob/master/bin/AEPAssurance-1.0.0-Unity.zip)
+| ACPUserProfile | https://github.com/adobe/unity_acpuserprofile | [ACPUserProfile](https://github.com/adobe/unity_acpuserprofile/blob/master/bin/ACPUserProfile-1.0.0-Unity.zip)
 
 ## Contributing
 Looking to contribute to this project? Please review our [Contributing guidelines](.github/CONTRIBUTING.md) prior to opening a pull request.
